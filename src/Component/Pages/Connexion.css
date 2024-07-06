@@ -1,0 +1,38 @@
+.connexionCard {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;  
+    width: 100vw;  
+    overflow: hidden; 
+    padding: 0;
+    margin: 0;
+    color: black;
+  }
+.left {
+    flex: 1;
+    height: 1024px;
+  }
+  .photo {
+    height: 1024px;
+    background: url('../../assets/Rectangle.png') lightgray 50% / cover no-repeat;
+  }
+  .right {
+    flex: 1;
+    height: 100vh;
+    background: rgba(0, 0, 160, 0.70);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 20px;
+    color: #FFFFFF;
+    font-style: normal;
+    font-weight: bold;
+    line-height: normal;
+  }
+  .formular{
+   margin: 70px;
+   width: 500px;
+  }
+ 
