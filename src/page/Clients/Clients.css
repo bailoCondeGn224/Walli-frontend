@@ -1,0 +1,10 @@
+.css-14mxsc7-MuiDataGrid-root .MuiDataGrid-columnHeaderTitleContainer{
+    background-color: rgba(176, 176, 252, 0.7);
+}
+.css-14mxsc7-MuiDataGrid-root .MuiDataGrid-cell{
+    border-bottom: 1px solid rgba(0, 0, 160, 0.70) !important;
+}
+
+.css-14mxsc7-MuiDataGrid-root .MuiDataGrid-columnHeader, .css-14mxsc7-MuiDataGrid-root .MuiDataGrid-cell{
+    padding: 0 5px !important;
+}
