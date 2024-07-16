@@ -1,20 +1,52 @@
-import { Box, Button, IconButton, Tooltip } from "@mui/material";
-import {
-  DataGrid,
-  GridToolbarContainer,
-  GridToolbarColumnsButton,
-  GridToolbarFilterButton,
-  GridToolbarDensitySelector,
-} from "@mui/x-data-grid";
-import { IoMdDownload } from "react-icons/io";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import ClientData from "../../Data/ClientData";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { IoEyeSharp } from "react-icons/io5";
 import { GrFormEdit } from "react-icons/gr";
-
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import "./Clients.css";
+import { DeleteModal } from "../../Component/Button/ButtonAdd";
+import Client from "../../Component/Modal/Clients/Client";
+import { useState } from "react";
+import ShowModal from "../../Component/Modal/Clients/ShowModal";
+import UpdateModal from "../../Component/Modal/Clients/UpdateModal";
+import FileBody from "../../Component/Helper/FileBody";
 
 const Clients = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenShowModal, setIsOpenShowModal] = useState<boolean>(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
+  const [isOpenUpdateModal, setIsOpenUpdateModal] = useState<boolean>(false);
+
+  const handleModalClose = () => {
+    setIsOpen(false);
+  };
+  const handleModalOpen = () => {
+    setIsOpen(true);
+  };
+
+  const handleModalOpenShow = () => {
+    setIsOpenShowModal(true);
+  };
+
+  const handleModalCloseUpdate = () => {
+    setIsOpenUpdateModal(false);
+  };
+
+  const handleModalOpenUpdate = () => {
+    setIsOpenUpdateModal(true);
+  };
+
+  const handleModalCloseDelete = () => {
+    setIsOpenDeleteModal(false);
+  };
+
+  const handleModalOpenDelete = () => {
+    setIsOpenDeleteModal(true);
+  };
+
+  const handleModalCloseShowModal = () => {
+    setIsOpenShowModal(false);
+  };
   // pour les colonnes du tableau
   const columns: any[] = [
     {
@@ -67,7 +99,7 @@ const Clients = () => {
       ),
       flex: 1,
       headerAlign: "center",
-      renderCell: (params: any) => (
+      renderCell: (_params: any) => (
         <Box
           display="flex"
           justifyContent="center"
@@ -82,7 +114,7 @@ const Clients = () => {
               padding: "0px 15px",
             }}
           >
-            <IconButton>
+            <IconButton onClick={handleModalOpenShow}>
               <IoEyeSharp
                 size={20}
                 style={{ color: "rgba(0, 0, 160, 0.70)" }}
@@ -98,7 +130,7 @@ const Clients = () => {
               padding: "0px 15px",
             }}
           >
-            <IconButton>
+            <IconButton onClick={handleModalOpenUpdate}>
               <GrFormEdit
                 size={20}
                 style={{ color: "rgba(0, 0, 160, 0.70)" }}
@@ -109,8 +141,8 @@ const Clients = () => {
             title="Supprimer"
             style={{ color: "red", cursor: "pointer", padding: "0px 15px" }}
           >
-            <IconButton>
-              <DeleteIcon sx={{ color: "red" }} size={10} />
+            <IconButton onClick={handleModalOpenDelete}>
+              <DeleteRoundedIcon />
             </IconButton>
           </Tooltip>
         </Box>
@@ -120,98 +152,46 @@ const Clients = () => {
 
   return (
     <Box m="0px">
-      <Box
-        marginTop="25px"
-        marginLeft="40px"
-        marginRight="40px"
-        height="75vh"
-        sx={{
-          background: "#ffffff",
-          "& .nom-column--cell": {
-            color: `var(--color-text-black)`,
-          },
-          "& .MuiDataGrid-row": {
-            color: `var(--color-text-black)`,
-          },
-          "& .MuiDataGrid-columnHeadersInner": {
-            bgcolor: "#FFFFFF",
-          },
-          "& .MuiDataGrid-VirtualScroller": {
-            bgcolor: "#FFFFFF",
-          },
-          "& .MuiDataGrid-footerContainer": {
-            bgcolor: "#FFFFFF",
-          },
-          "&.css-128fb87-MuiDataGrid-toolbarContainer": {
-            bgcolor: "#FFFFFF",
-          },
-          "& .MuiDataGrid-virtualScrollerContent": {
-            bgcolor: "#FFFFFF",
-          },
-        }}
-      >
-        <DataGrid
-          rows={ClientData}
-          columns={columns}
-          pagination={true}
-          checkboxSelection
-          initialState={{
-            pagination: { paginationModel: { pageSize: 9 } },
-          }}
-          pageSizeOptions={[5, 9, 25]}
-          getRowId={(row) => row.id}
-          slots={{
-            toolbar: () => (
-              <GridToolbarContainer
-                sx={{
-                  backgroundColor: "#FFFFFF",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  paddingRight: "10px",
-                }}
-              >
-                <div>
-                  <GridToolbarColumnsButton />
-                  <GridToolbarFilterButton />
-                  <GridToolbarDensitySelector />
-                </div>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    // onClick={() => clientDataExport(ClientData)}
-                    sx={{
-                      color: "rgba(0, 0, 160, 0.70)",
-                      borderColor: "rgba(0, 0, 160, 0.70)",
-                      borderRadius: "0px",
-                      minWidth: "36px",
-                      minHeight: "36px",
-                      padding: "0",
-                      mb: "3px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      "&:hover": {
-                        backgroundColor: "#000000",
-                        color: "#ffffff",
-                      },
-                    }}
-                  >
-                    <IoMdDownload />
-                  </Button>
-                </Box>
-              </GridToolbarContainer>
-            ),
-          }}
-        />
-      </Box>
+      <FileBody
+        clientData={ClientData}
+        columns={columns}
+        handleModalOpen={handleModalOpen}
+      />
+      <Client isOpen={isOpen} handleModalClose={handleModalClose} />
+      <DeleteModal
+        isOpen={isOpenDeleteModal}
+        handleClose={handleModalCloseDelete}
+      />
+      <ShowModal
+        nom="conde"
+        prenom="bailo"
+        email="bailoconde@gmail.com"
+        role="admin"
+        dateNaissance="01-1998"
+        ville="conakry"
+        numeroTelephone="613134885"
+        typePiece="passport"
+        pieceIdentite="0054875421"
+        sexe="M"
+        nationnalite="Guineen"
+        isOpen={isOpenShowModal}
+        handleModalClose={handleModalCloseShowModal}
+      />
+      <UpdateModal
+        nom="conde"
+        prenom="bailo"
+        email="bailoconde@gmail.com"
+        role="admin"
+        dateNaissance="01-1998"
+        ville="conakry"
+        numeroTelephone="613134885"
+        typePiece="passport"
+        pieceIdentite="0054875421"
+        sexe="M"
+        nationnalite="Guineen"
+        isOpen={isOpenUpdateModal}
+        handleModalClose={handleModalCloseUpdate}
+      />
     </Box>
   );
 };

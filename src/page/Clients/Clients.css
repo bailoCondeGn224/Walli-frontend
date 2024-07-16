@@ -7,4 +7,9 @@
 
 .css-14mxsc7-MuiDataGrid-root .MuiDataGrid-columnHeader, .css-14mxsc7-MuiDataGrid-root .MuiDataGrid-cell{
     padding: 0 5px !important;
+}   
+.css-1t4vnk2-MuiDialogContent-root{
+    border-bottom: 1px solid rgba(0, 0, 160, 0.70) !important;
+    border-top: 1px solid rgba(0, 0, 160, 0.70) !important;
+
 }
