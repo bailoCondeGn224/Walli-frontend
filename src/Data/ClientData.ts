@@ -35,11 +35,11 @@ interface Client {
         dateMiseEnSevice: '2022-01-15',
         validiteVisiteTechnique: '2024-01-15',
         numeroCarteVerte: 'CV123456',
-        existeAssurance: true,
+        existeAssurance: "Non",
         assuranceExpire: '2024-01-15',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2025-01-15',
-        existevignette: true,
+        existevignette: "Non",
         vignetteExpire: '2024-06-15'
     },
     {
@@ -52,11 +52,11 @@ interface Client {
         dateMiseEnSevice: '2021-05-20',
         validiteVisiteTechnique: '2023-05-20',
         numeroCarteVerte: 'CV654321',
-        existeAssurance: false,
+        existeAssurance: "Non",
         assuranceExpire: '2023-05-20',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2024-05-20',
-        existevignette: false,
+        existevignette: "Non",
         vignetteExpire: 'N/A'
     },
     {
@@ -69,11 +69,11 @@ interface Client {
         dateMiseEnSevice: '2019-07-10',
         validiteVisiteTechnique: '2022-07-10',
         numeroCarteVerte: 'CV789012',
-        existeAssurance: true,
+        existeAssurance: "Non",
         assuranceExpire: '2023-07-10',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2024-07-10',
-        existevignette: true,
+        existevignette: "Non",
         vignetteExpire: '2023-12-10'
     },
     {
@@ -86,11 +86,11 @@ interface Client {
         dateMiseEnSevice: '2020-08-25',
         validiteVisiteTechnique: '2023-08-25',
         numeroCarteVerte: 'CV123789',
-        existeAssurance: true,
+        existeAssurance: "Non",
         assuranceExpire: '2024-08-25',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2025-08-25',
-        existevignette: true,
+        existevignette: "Non",
         vignetteExpire: '2024-02-25'
     },
     {
@@ -103,11 +103,11 @@ interface Client {
         dateMiseEnSevice: '2021-12-30',
         validiteVisiteTechnique: '2024-12-30',
         numeroCarteVerte: 'CV987654',
-        existeAssurance: true,
+        existeAssurance: "Non",
         assuranceExpire: '2024-12-30',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2025-12-30',
-        existevignette: true,
+        existevignette: "Non",
         vignetteExpire: '2024-07-30'
     },
     {
@@ -120,11 +120,11 @@ interface Client {
         dateMiseEnSevice: '2018-09-15',
         validiteVisiteTechnique: '2023-09-15',
         numeroCarteVerte: 'CV456789',
-        existeAssurance: true,
+        existeAssurance: "Non",
         assuranceExpire: '2023-09-15',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2024-09-15',
-        existevignette: true,
+        existevignette: "Non",
         vignetteExpire: '2024-03-15'
     },
     {
@@ -137,11 +137,11 @@ interface Client {
         dateMiseEnSevice: '2022-04-01',
         validiteVisiteTechnique: '2025-04-01',
         numeroCarteVerte: 'CV741258',
-        existeAssurance: true,
+        existeAssurance: "Non",
         assuranceExpire: '2025-04-01',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2026-04-01',
-        existevignette: true,
+        existevignette: "Non",
         vignetteExpire: '2025-10-01'
     },
     {
@@ -154,11 +154,11 @@ interface Client {
         dateMiseEnSevice: '2020-03-18',
         validiteVisiteTechnique: '2023-03-18',
         numeroCarteVerte: 'CV852963',
-        existeAssurance: false,
+        existeAssurance: "Non",
         assuranceExpire: '2023-03-18',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2024-03-18',
-        existevignette: true,
+        existevignette: "Non",
         vignetteExpire: '2023-09-18'
     },
     {
@@ -171,11 +171,11 @@ interface Client {
         dateMiseEnSevice: '2021-06-30',
         validiteVisiteTechnique: '2024-06-30',
         numeroCarteVerte: 'CV963852',
-        existeAssurance: true,
+        existeAssurance: "Non",
         assuranceExpire: '2024-06-30',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2025-06-30',
-        existevignette: true,
+        existevignette: "Non",
         vignetteExpire: '2024-12-30'
     },
     {
@@ -188,11 +188,11 @@ interface Client {
         dateMiseEnSevice: '2020-11-20',
         validiteVisiteTechnique: '2023-11-20',
         numeroCarteVerte: 'CV852741',
-        existeAssurance: true,
+        existeAssurance: "Non",
         assuranceExpire: '2023-11-20',
-        existeCarteGris: true,
+        existeCarteGris: "Non",
         carteGrisExpire: '2024-11-20',
-        existevignette: false,
+        existevignette: "Non",
         vignetteExpire: 'N/A'
     }
 ];

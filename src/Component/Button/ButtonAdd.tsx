@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -6,9 +7,10 @@ import {
   Modal,
   Select,
   Typography,
+  SelectChangeEvent,
 } from "@mui/material";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
-import { useState } from "react";
+
 interface ButtonAddProps {
   onClick: () => void;
 }
@@ -17,6 +19,7 @@ interface ButtonDelete {
   isOpen: boolean;
   handleClose: () => void;
 }
+
 export const ButtonAdd: React.FC<ButtonAddProps> = ({ onClick }) => {
   return (
     <div>
@@ -40,13 +43,15 @@ export const ButtonAdd: React.FC<ButtonAddProps> = ({ onClick }) => {
     </div>
   );
 };
-interface engin {
+
+interface Engin {
   motot: string;
   voitureT: string;
   motoP: string;
   voitureP: string;
 }
-const valueSeach: engin[] = [
+
+const valueSeach: Engin[] = [
   {
     motot: "TAXI MOTO",
     voitureT: "TAXI VOITURE",
@@ -55,20 +60,27 @@ const valueSeach: engin[] = [
   },
 ];
 
-export const ButtonSelectSeach = () => {
+interface ButtonSelectSeachProps {
+  onSelectChange: (value: string) => void;
+}
+
+export const ButtonSelectSeach: React.FC<ButtonSelectSeachProps> = ({
+  onSelectChange,
+}) => {
   const [valueSelectForm, setValueSelectForm] = useState("");
 
-  const handleChange = (values: string) => {
-    setValueSelectForm(values);
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value as string;
+    setValueSelectForm(value);
+    onSelectChange(valueSelectForm);
   };
+
   return (
     <Select
       labelId="demo-simple-select-label"
       id="demo-simple-select"
       name="valueSelectForm"
-      onChange={() => {
-        handleChange(valueSelectForm);
-      }}
+      onChange={handleChange}
       value={valueSelectForm}
       sx={{
         border: "1px solid rgba(0,0,160, 0.7)",
@@ -85,7 +97,9 @@ export const ButtonSelectSeach = () => {
         "MOTO PERSONNELLE",
         "VOITURE PERSONNELLE",
       ].map((value) => (
-        <MenuItem>{value}</MenuItem>
+        <MenuItem key={value} value={value}>
+          {value}
+        </MenuItem>
       ))}
     </Select>
   );
@@ -110,7 +124,6 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
   return (
     <Modal
       open={isOpen}
-      // onClose={handleModalClose}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -137,9 +150,9 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
           </Button>
         </Box>
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Etes vous sur de vouloir supprimer cet elements?
+          Etes vous sur de vouloir supprimer cet élément?
           <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
-            Cette action est irreversible
+            Cette action est irréversible
           </Typography>
         </Typography>
         <Box>

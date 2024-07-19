@@ -16,23 +16,22 @@ import {
   TextField,
 } from "@mui/material";
 import { Form, Formik } from "formik";
+import React, { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
-
 import {
   EnginRoulantSchema,
-  initialValuesEngin,
+  fakeValuesEngin,
 } from "../../Helper/InitialevalueFormik";
-import { addCustumer } from "../../Interface/InterfaceClient";
-import { useState } from "react";
 
-const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
+const ModalShowEngin = () => {
+  const [searchParams] = useSearchParams();
   const [isSelectedAssurance, setIsSelectedAssurance] = useState(false);
   const [isSelectedCarteGris, setIsSelectedCarteGris] = useState(false);
   const [isSelectedVignette, setIsSelectedVignette] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmits = (values: any) => {
-    console.log(values);
-  };
+  const handleSubmits = () => {};
   return (
     <Dialog
       sx={{
@@ -42,7 +41,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
         },
       }}
       maxWidth="lg"
-      open={isOpen}
+      open={searchParams.get("isOpenModalShow") === "true"}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
@@ -63,7 +62,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
         </DialogTitle>
         <Button
           sx={{ fontSize: "1.3rem", fontWeight: "bold", mr: 1.5 }}
-          onClick={handleModalClose}
+          onClick={() => navigate("/path-to-engin")}
         >
           <CancelPresentationIcon
             sx={{
@@ -77,7 +76,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
 
       <Formik
         onSubmit={handleSubmits}
-        initialValues={initialValuesEngin}
+        initialValues={fakeValuesEngin}
         validationSchema={EnginRoulantSchema}
       >
         {({ values, handleChange, handleBlur, touched, errors }) => (
@@ -95,6 +94,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                   <label htmlFor="nom">Immatricule</label>
                   <TextField
                     fullWidth
+                    disabled
                     type="text"
                     size="small"
                     name="immatricule"
@@ -111,6 +111,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                   <label htmlFor="prenom">Nom propriétaire</label>
                   <TextField
                     fullWidth
+                    disabled
                     type="text"
                     size="small"
                     name="nomProprietaire"
@@ -131,6 +132,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                   <label htmlFor="email">Marque</label>
                   <TextField
                     fullWidth
+                    disabled
                     type="text"
                     size="small"
                     name="marque"
@@ -147,6 +149,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                   <label htmlFor="email">Modèle</label>
                   <TextField
                     fullWidth
+                    disabled
                     type="text"
                     size="small"
                     name="modele"
@@ -163,6 +166,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                   <label htmlFor="role">Type d'activité</label>
                   <Select
                     fullWidth
+                    disabled
                     size="small"
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
@@ -189,6 +193,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                   <label htmlFor="">Date mise en service</label>
                   <TextField
                     fullWidth
+                    disabled
                     size="small"
                     type="date"
                     name="dateMiseEnSevice"
@@ -209,6 +214,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                   <label htmlFor="ville">Numéro carte verte</label>
                   <TextField
                     fullWidth
+                    disabled
                     size="small"
                     id="outlined-numeroCarteVerte"
                     name="numeroCarteVerte"
@@ -264,11 +270,13 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                             value="Oui"
                             control={<Radio />}
                             label="Oui"
+                            disabled
                           />
                           <FormControlLabel
                             value="Non"
                             control={<Radio />}
                             label="Non"
+                            disabled
                           />
                         </RadioGroup>
                       </FormControl>
@@ -338,11 +346,13 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                             value="Oui"
                             control={<Radio />}
                             label="Oui"
+                            disabled
                           />
                           <FormControlLabel
                             value="Non"
                             control={<Radio />}
                             label="Non"
+                            disabled
                           />
                         </RadioGroup>
                       </FormControl>
@@ -411,11 +421,13 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                             value="Oui"
                             control={<Radio />}
                             label="Oui"
+                            disabled
                           />
                           <FormControlLabel
                             value="Non"
                             control={<Radio />}
                             label="Non"
+                            disabled
                           />
                         </RadioGroup>
                       </FormControl>
@@ -475,7 +487,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                     height: "36px",
                   },
                 }}
-                onClick={handleModalClose}
+                onClick={() => navigate("/path-to-engin")}
               >
                 Annuler
               </Button>
@@ -506,4 +518,4 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
   );
 };
 
-export default ModalAddEngin;
+export default ModalShowEngin;

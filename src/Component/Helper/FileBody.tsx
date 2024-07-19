@@ -10,7 +10,14 @@ import { ButtonAdd, ButtonSelectSeach } from "../Button/ButtonAdd";
 import { IoMdDownload } from "react-icons/io";
 import { BodyInterface } from "../Interface/InterfaceClient";
 
-const FileBody = (value: BodyInterface) => {
+interface FileBodyProps {
+  clientData: any[];
+  columns: any[];
+  handleModalOpen: () => void;
+  onSelectChange: (value: string) => void;
+}
+
+const FileBody: React.FC<FileBodyProps> = (props) => {
   return (
     <Box
       marginTop="25px"
@@ -43,8 +50,8 @@ const FileBody = (value: BodyInterface) => {
       }}
     >
       <DataGrid
-        rows={value.clientData}
-        columns={value.columns}
+        rows={props.clientData}
+        columns={props.columns}
         pagination={true}
         checkboxSelection
         initialState={{
@@ -76,8 +83,8 @@ const FileBody = (value: BodyInterface) => {
                   gap: "5px",
                 }}
               >
-                <ButtonSelectSeach />
-                <ButtonAdd onClick={value.handleModalOpen} />
+                <ButtonSelectSeach onSelectChange={props.onSelectChange} />
+                <ButtonAdd onClick={props.handleModalOpen} />
                 <Button
                   variant="outlined"
                   // onClick={() => clientDataExport(ClientData)}

@@ -9,21 +9,52 @@ import { enginsRoulants } from "../../Data/ClientData";
 import FileBody from "../../Component/Helper/FileBody";
 import ModalAddEngin from "../../Component/Modal/Engins/ModalAddEngin";
 import { useState } from "react";
+import { DeleteModal } from "../../Component/Button/ButtonAdd";
+import ModalUpdateEngin from "../../Component/Modal/Engins/ModalUpdateEngin";
+import ScannerIcon from "@mui/icons-material/Scanner";
+
+import { fakeValuesEngin } from "../../Component/Helper/InitialevalueFormik";
+import { useNavigate } from "react-router-dom";
+import ModalShowEngin from "../../Component/Modal/Engins/ModalShowEngin";
+import ModalQrCode from "../../Component/Modal/Engins/ModalQrCode";
 
 const Engin = () => {
   const [isOpenEngin, setIsOpenEngin] = useState<boolean>(false);
-  //   const [isOpenShowModalEngin, setIsOpenShowModalEngin] =
-  //     useState<boolean>(false);
-  //   const [isOpenDeleteModalEngin, setIsOpenDeleteModalEngin] =
-  //     useState<boolean>(false);
-  //   const [isOpenUpdateModalEngin, setIsOpenUpdateModalEngin] =
-  //     useState<boolean>(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
+  const [getValueSearchButton, setGetValueSearchButton] = useState("");
+
+  const navigate = useNavigate();
 
   const handleModalClose = () => {
     setIsOpenEngin(false);
   };
+
   const handleModalOpen = () => {
     setIsOpenEngin(true);
+  };
+
+  const handleModalCloseDelete = () => {
+    setIsOpenDeleteModal(false);
+  };
+
+  const handleModalOpenDelete = () => {
+    setIsOpenDeleteModal(true);
+  };
+
+  const handleUpdateClick = (id: string) => {
+    navigate(`?isOpenModalUpdate=true&id=${id}`);
+  };
+
+  const handleShowClick = (id: string) => {
+    navigate(`?isOpenModalShow=true&id=${id}`);
+  };
+
+  const handleQrCodeClick = (id: string) => {
+    navigate(`?isOpenModalQrCode=true&id=${id}`);
+  };
+
+  const handleSelectChange = (value: string) => {
+    setGetValueSearchButton(value);
   };
 
   const columns: GridColDef[] = [
@@ -136,6 +167,24 @@ const Engin = () => {
               cursor: "pointer",
               padding: "0px 15px",
             }}
+            onClick={() => handleQrCodeClick(_params.row.id)}
+          >
+            <IconButton>
+              <ScannerIcon
+                style={{ color: "rgba(0, 0, 160, 0.70)" }}
+                sx={{ size: "20px" }}
+              />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip
+            title="Afficher"
+            sx={{
+              marginRight: "-15px",
+              cursor: "pointer",
+              padding: "0px 15px",
+            }}
+            onClick={() => handleShowClick(_params.row.id)}
           >
             <IconButton>
               <IoEyeSharp
@@ -152,6 +201,7 @@ const Engin = () => {
               cursor: "pointer",
               padding: "0px 15px",
             }}
+            onClick={() => handleUpdateClick(_params.row.id)}
           >
             <IconButton>
               <GrFormEdit
@@ -161,6 +211,7 @@ const Engin = () => {
             </IconButton>
           </Tooltip>
           <Tooltip
+            onClick={handleModalOpenDelete}
             title="Supprimer"
             style={{ color: "red", cursor: "pointer", padding: "0px 15px" }}
           >
@@ -179,8 +230,18 @@ const Engin = () => {
         clientData={enginsRoulants}
         columns={columns}
         handleModalOpen={handleModalOpen}
+        onSelectChange={handleSelectChange}
       />
       <ModalAddEngin isOpen={isOpenEngin} handleModalClose={handleModalClose} />
+
+      <DeleteModal
+        isOpen={isOpenDeleteModal}
+        handleClose={handleModalCloseDelete}
+      />
+
+      <ModalUpdateEngin enginValue={fakeValuesEngin} />
+      <ModalShowEngin />
+      <ModalQrCode />
     </Box>
   );
 };

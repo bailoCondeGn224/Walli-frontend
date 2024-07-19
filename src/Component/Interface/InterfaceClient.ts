@@ -27,15 +27,7 @@ export interface BodyInterface {
     handleModalOpen: () => void;
 }
 export interface EnginRoulant {
-    id: number;
-    immatricule: string;
-    nomProprietaire: string;
-    marque: string;
-    modele: string;
-    typeActivite: string;
-}
-export interface EnginRoulant {
-    id: number;
+    id:number;
     immatricule: string;
     nomProprietaire: string;
     marque: string;
@@ -44,10 +36,18 @@ export interface EnginRoulant {
     dateMiseEnSevice:string;
     validiteVisiteTechnique:string;
     numeroCarteVerte:string;
-    existeAssurance:boolean;
+    existeAssurance:string;
     assuranceExpire:string;
-    existeCarteGris:boolean;
+    existeCarteGris:string;
     carteGrisExpire:string;
-    existevignette:boolean;
+    existevignette:string;
     vignetteExpire:string;
+}
+
+export interface ToggleModal{
+    isOpen:boolean;
+    handleClose:()=>void;
+}
+export interface qrCode{
+    value:string;
 }

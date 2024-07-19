@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 
 export const initialValuesEngin = {
-    id: 0,
+    id:0,
     immatricule: "",
     nomProprietaire: "",
     marque: "",
@@ -10,16 +10,33 @@ export const initialValuesEngin = {
     dateMiseEnSevice: "",
     validiteVisiteTechnique: "",
     numeroCarteVerte: "",
-    existeAssurance: false,
+    existeAssurance: "Non",
     assuranceExpire: "",
-    existeCarteGris: false,
+    existeCarteGris: "Non",
     carteGrisExpire: "",
-    existevignette: false,
+    existevignette: "Non",
     vignetteExpire: "",
   };
 
+  export const fakeValuesEngin = {
+    id:0,
+    immatricule: "ABC123",
+    nomProprietaire: "John Doe",
+    marque: "Toyota",
+    modele: "Camry",
+    typeActivite: "TAXI_MOTO",
+    dateMiseEnSevice: "2020-01-01",
+    validiteVisiteTechnique: "2023-01-01",
+    numeroCarteVerte: "123456789",
+    existeAssurance: "Oui",
+    assuranceExpire: "2023-12-31",
+    existeCarteGris: "Oui",
+    carteGrisExpire: "2023-12-31",
+    existevignette: "Oui",
+    vignetteExpire: "2023-12-31",
+  };
+
   export  const EnginRoulantSchema = Yup.object().shape({
-    id: Yup.number().required("ID est requis"),
     immatricule: Yup.string().required("Immatricule est requis"),
     nomProprietaire: Yup.string().required("Nom propriétaire est requis"),
     marque: Yup.string().required("Marque est requise"),
@@ -35,19 +52,13 @@ export const initialValuesEngin = {
     existeAssurance: Yup.boolean().required(
       "Existence de l'assurance est requise"
     ),
-    assuranceExpire: Yup.string().required(
-      "Date d'expiration de l'assurance est requise"
-    ),
+    assuranceExpire: Yup.string(),
     existeCarteGris: Yup.boolean().required(
       "Existence de la carte grise est requise"
     ),
-    carteGrisExpire: Yup.string().required(
-      "Date d'expiration de la carte grise est requise"
-    ),
+    carteGrisExpire: Yup.string(),
     existevignette: Yup.boolean().required(
       "Existence de la vignette est requise"
     ),
-    vignetteExpire: Yup.string().required(
-      "Date d'expiration de la vignette est requise"
-    ),
+    vignetteExpire: Yup.string(),
   });
