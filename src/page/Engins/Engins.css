@@ -1,1 +1,11 @@
- 
+/* *, *::before, *::after {
+    overflow-x: hidden !important;
+    box-sizing: content-box;
+}
+  */
+
+  .MuiBox-root,
+   .css-dpoqzr{
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+   }

@@ -3,48 +3,49 @@ import "./Connexion.css";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { connexionInterface } from "../../Component/Interface/InterfaceClient";
 import { login } from "../../backEnd/AuthService";
-// import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface valuess {
+  email: string;
+  password: string;
+}
 
 const Connexion = () => {
-  //  const navigate = useNavigate();
   const userSchema = Yup.object().shape({
-    login: Yup.string().required("Identifiant est requis"),
+    email: Yup.string().required("Identifiant est requis"),
     password: Yup.string().required("Mot de passe est requis"),
   });
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<string>("");
-  const initialValues: connexionInterface = {
+  const initialValues: valuess = {
     email: "",
     password: "",
   };
 
-  const handleSubmit = (values: connexionInterface) => {
-    console.log(values);
-    login(values)
-      .then((response) => {
-        if (response) {
-          localStorage.setItem("user", JSON.stringify(response.data));
-          setIsLoading(false);
-          // navigate("/");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsError("erreur de connexion");
-        setIsLoading(false);
-      });
+  const handleSubmit = async (values: valuess) => {
+    setIsLoading(true);
+    setIsError("");
+    try {
+      const response = await login(values);
+      console.log("Received response:", response);
+      localStorage.setItem("user", JSON.stringify(response));
+      navigate("/clients/moto");
+    } catch (error) {
+      console.error("Login error:", error);
+      setIsError("Erreur de connexion");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
     <div className="connexionCard">
-      {/* la partie droite */}
       <div className="left">
         <div className="photo"></div>
       </div>
-      {/* la partie gauche */}
       <div className="right">
         <div className="title">
           <h1>BIENVENUE CHEZ WALLI</h1>
@@ -59,7 +60,7 @@ const Connexion = () => {
             {({ values, errors, touched, handleBlur, handleChange }) => (
               <Form>
                 <label
-                  htmlFor="outlined-login"
+                  htmlFor="outlined-email"
                   style={{ fontWeight: "bold", fontSize: "16px" }}
                 >
                   Identifiant
@@ -79,8 +80,8 @@ const Connexion = () => {
                   as={TextField}
                   type="text"
                   variant="outlined"
-                  name="login"
-                  id="outlined-login"
+                  name="email"
+                  id="outlined-email"
                   margin="normal"
                   placeholder="Identifiant"
                   fullWidth
@@ -95,7 +96,7 @@ const Connexion = () => {
                       backgroundColor: "#fff",
                       borderRadius: "6px",
                     },
-                    disableUnderline: true,
+                    // disableUnderline: true,
                   }}
                 />
                 <label
@@ -123,7 +124,7 @@ const Connexion = () => {
                       backgroundColor: "#fff",
                       borderRadius: "6px",
                     },
-                    disableUnderline: true,
+                    // disableUnderline: true,
                   }}
                 />
                 <Button
@@ -154,14 +155,13 @@ const Connexion = () => {
             )}
           </Formik>
 
-          {/* Texte "Vous êtes perdu?" */}
           <Box display="flex" pt="20px" alignItems="center" gap={0}>
             <RiQuestionFill
               style={{ marginRight: "20px", color: "#FFF" }}
               size={24}
             />
             <Typography color="#939597">
-              Avez vous besoin d'aide?
+              Avez-vous besoin d'aide?
               <span style={{ marginLeft: "8px" }}>
                 <a
                   href="#"
@@ -175,7 +175,6 @@ const Connexion = () => {
 
           <Box display="flex" pt="200px" alignItems="center" gap={1}>
             <Typography color="#fff">Powered by Walli</Typography>
-            <Box></Box>
           </Box>
         </div>
       </div>

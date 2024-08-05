@@ -10,7 +10,10 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
-
+import { DatePicker } from "@mui/lab";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs, { Dayjs } from "dayjs";
 interface ButtonAddProps {
   onClick: () => void;
 }
@@ -207,5 +210,19 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
         </Box>
       </Box>
     </Modal>
+  );
+};
+
+export const DateButtonSelected = () => {
+  return (
+    <LocalizationProvider>
+      <DemoContainer components={["DatePicker", "DatePicker"]}>
+        <DatePicker
+          label={'"month"'}
+          openTo="month"
+          views={["year", "month", "day"]}
+        />
+      </DemoContainer>
+    </LocalizationProvider>
   );
 };

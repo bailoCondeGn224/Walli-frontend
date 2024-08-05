@@ -29,7 +29,7 @@ const ModalQrCode: React.FC = () => {
 
   // Fonction pour fermer le modal
   const closeQrcode = () => {
-    navigate("/path-to-engin");
+    navigate("/engins/engin1");
   };
 
   const qrCard = () => (

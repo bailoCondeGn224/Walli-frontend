@@ -62,7 +62,7 @@ const ModalShowEngin = () => {
         </DialogTitle>
         <Button
           sx={{ fontSize: "1.3rem", fontWeight: "bold", mr: 1.5 }}
-          onClick={() => navigate("/path-to-engin")}
+          onClick={() => navigate("/engins/engin1")}
         >
           <CancelPresentationIcon
             sx={{
@@ -487,7 +487,7 @@ const ModalShowEngin = () => {
                     height: "36px",
                   },
                 }}
-                onClick={() => navigate("/path-to-engin")}
+                onClick={() => navigate("/engins/engin1")}
               >
                 Annuler
               </Button>

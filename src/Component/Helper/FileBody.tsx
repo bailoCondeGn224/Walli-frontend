@@ -6,9 +6,12 @@ import {
   GridToolbarDensitySelector,
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
-import { ButtonAdd, ButtonSelectSeach } from "../Button/ButtonAdd";
+import {
+  ButtonAdd,
+  ButtonSelectSeach,
+  DateButtonSelected,
+} from "../Button/ButtonAdd";
 import { IoMdDownload } from "react-icons/io";
-import { BodyInterface } from "../Interface/InterfaceClient";
 
 interface FileBodyProps {
   clientData: any[];
@@ -83,6 +86,7 @@ const FileBody: React.FC<FileBodyProps> = (props) => {
                   gap: "5px",
                 }}
               >
+                <DateButtonSelected />
                 <ButtonSelectSeach onSelectChange={props.onSelectChange} />
                 <ButtonAdd onClick={props.handleModalOpen} />
                 <Button

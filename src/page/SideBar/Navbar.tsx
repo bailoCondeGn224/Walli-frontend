@@ -18,15 +18,13 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsIcon from "@mui/icons-material/Settings";
-
 import "./Navbar.css";
-import { Avatar, Badge, Collapse } from "@mui/material";
+import { Avatar, Badge, Collapse, Menu, MenuItem } from "@mui/material";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import links from "../../Data/Link";
-
-// import Clients from "../Clients/Clients";
-import Engin from "../Engins/Engin";
-
+import { Outlet, useNavigate } from "react-router-dom";
+import ResetPassword from "../../Component/Modal/ResetPassword/ResetPassword";
+import { Link as RouterLink } from "react-router-dom";
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -109,11 +107,25 @@ const Navbar: React.FC = () => {
   const [collapseStates, setCollapseStates] = React.useState<
     Record<number, boolean>
   >({});
+  const [selectedMenu, setSelectedMenu] = React.useState<number | null>(null);
+  const [selectedSubMenu, setSelectedSubMenu] = React.useState<number | null>(
+    null
+  );
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const isMenuOpen = Boolean(anchorEl);
+  const navigate = useNavigate();
+
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
   const handleDrawerOpen = () => {
     setOpen(true);
+  };
+
+  const handleQrCodeClick = () => {
+    setOpenDialog(true);
+    setAnchorEl(null);
   };
 
   const handleDrawerClose = () => {
@@ -127,32 +139,52 @@ const Navbar: React.FC = () => {
     }));
   };
 
+  const handleMenuClick = (id: number) => {
+    setSelectedMenu(id);
+    setSelectedSubMenu(null);
+  };
+
+  const handleSubMenuClick = (id: number) => {
+    setSelectedSubMenu(id);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleClicks = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const menuId = "primary-search-account-menu";
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleQrCodeClick}>Votre Compte</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Deconnexion</MenuItem>
+    </Menu>
+  );
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        open={open}
-        sx={{
-          background: "white",
-        }}
-      >
-        <Toolbar
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
+      <AppBar position="fixed" open={open} sx={{ background: "white" }}>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
               onClick={handleDrawerOpen}
               edge="start"
-              sx={{
-                marginRight: 5,
-                ...(open && { display: "none" }),
-              }}
+              sx={{ marginRight: 5, ...(open && { display: "none" }) }}
             >
               <MenuIcon sx={{ color: "black" }} />
             </IconButton>
@@ -165,9 +197,7 @@ const Navbar: React.FC = () => {
               Walli Transport
             </Typography>
           </Box>
-          <Box
-            sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               size="large"
               aria-label="show 17 new notifications"
@@ -176,26 +206,44 @@ const Navbar: React.FC = () => {
               <Badge badgeContent={17} color="error">
                 <IoNotificationsCircleOutline
                   style={{
-                    color: " rgba(204, 204, 204, 0.8)",
+                    color: "rgba(204, 204, 204, 0.8)",
                     width: "40px",
                     height: "40px",
                   }}
                 />
               </Badge>
             </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
-            >
-              <SettingsIcon
+            <Box sx={{ position: "relative" }}>
+              <IconButton
+                size="large"
+                aria-label="show 4 new mails"
+                color="inherit"
+                id="basic-button"
+                aria-controls={open ? "basic-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+                onClick={handleClicks}
+              >
+                <SettingsIcon
+                  sx={{
+                    color: "rgba(204, 204, 204, 0.8)",
+                    width: "40px",
+                    height: "40px",
+                  }}
+                />
+              </IconButton>
+              <Box
                 sx={{
-                  color: " rgba(204, 204, 204, 0.8)",
-                  width: "40px",
-                  height: "40px",
+                  position: "absolute",
+                  top: "90%",
+                  right: 10,
+                  mt: 5,
+                  zIndex: 100,
                 }}
-              />
-            </IconButton>
+              >
+                {renderMenu}
+              </Box>
+            </Box>
             <IconButton
               size="large"
               edge="end"
@@ -235,15 +283,29 @@ const Navbar: React.FC = () => {
             <React.Fragment key={link.id}>
               <ListItem disablePadding>
                 <ListItemButton
+                  component={RouterLink}
+                  to={link.link}
                   sx={{
                     minHeight: 48,
                     justifyContent: open ? "initial" : "center",
                     px: 2.5,
                     color: "#fff",
+                    ...(selectedMenu === link.id && {
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: "4px",
+                        backgroundColor: "white",
+                      },
+                    }),
                   }}
-                  onClick={() =>
-                    link.children ? toggleCollapse(link.id) : null
-                  }
+                  onClick={() => {
+                    handleMenuClick(link.id);
+                    link.children ? toggleCollapse(link.id) : null;
+                  }}
                 >
                   <ListItemIcon
                     sx={{
@@ -267,6 +329,7 @@ const Navbar: React.FC = () => {
                         transform: collapseStates[link.id]
                           ? "rotate(0deg)"
                           : "rotate(-90deg)",
+                        display: open ? "block" : "none",
                       }}
                     >
                       <KeyboardArrowDownIcon />
@@ -285,12 +348,29 @@ const Navbar: React.FC = () => {
                     {link.children.map((child) => (
                       <ListItem
                         key={child.id}
-                        sx={{ paddingLeft: 1, paddingTop: 0, paddingBottom: 0 }}
+                        sx={{
+                          paddingLeft: 1,
+                          paddingTop: 0,
+                          paddingBottom: 0,
+                          position: "relative",
+                          ...(selectedSubMenu === child.id && {
+                            "&::after": {
+                              content: '""',
+                              position: "absolute",
+                              right: 0,
+                              top: 0,
+                              bottom: 0,
+                              width: "4px",
+                              backgroundColor: "yellow",
+                            },
+                          }),
+                        }}
                       >
                         <ListItemButton
-                          component="a"
-                          href={child.link}
+                          component={RouterLink}
+                          to={child.link}
                           sx={{ paddingTop: 0, paddingBottom: 0 }}
+                          onClick={() => handleSubMenuClick(child.id)}
                         >
                           <ListItemIcon>{child.icon}</ListItemIcon>
                           <ListItemText
@@ -309,11 +389,13 @@ const Navbar: React.FC = () => {
         <Divider />
       </Drawer>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 2 }}>
         <DrawerHeader />
-        {/* <Clients /> */}
-        <Engin />
+        <Box>
+          <Outlet />
+        </Box>
       </Box>
+      <ResetPassword open={openDialog} onClose={() => setOpenDialog(false)} />
     </Box>
   );
 };

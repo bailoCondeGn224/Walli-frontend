@@ -156,6 +156,9 @@ const Clients = () => {
         clientData={ClientData}
         columns={columns}
         handleModalOpen={handleModalOpen}
+        onSelectChange={function (value: string): void {
+          throw new Error("Function not implemented.");
+        }}
       />
       <Client isOpen={isOpen} handleModalClose={handleModalClose} />
       <DeleteModal

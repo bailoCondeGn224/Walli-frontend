@@ -13,9 +13,9 @@ import GroupIcon from "@mui/icons-material/Group";
 export interface Link {
   id: number;
   text: string;
-  link?: string; // Link is optional for titles
+  link?: string;
   icon?: React.ReactNode;
-  children?: Link[]; // Array of sub-links
+  children?: Link[];
 }
 
 const links: Link[] = [
@@ -65,14 +65,14 @@ const links: Link[] = [
   },
   {
     id: 7,
-    text: "Ventes",
+    text: "Boutique",
     link: "/faq",
     icon: <MonetizationOnIcon sx={{ color: "white" }} />,
   },
   {
     id: 8,
     text: "Taxes",
-    link: "/support",
+    link: "/taxes",
     icon: <AssignmentIcon sx={{ color: "white" }} />,
   },
   {
@@ -90,7 +90,7 @@ const links: Link[] = [
   {
     id: 11,
     text: "Utilisateurs",
-    link: "/portfolio",
+    link: "/user",
     icon: <GroupIcon sx={{ color: "white" }} />,
   },
 ];

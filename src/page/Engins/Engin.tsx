@@ -17,6 +17,7 @@ import { fakeValuesEngin } from "../../Component/Helper/InitialevalueFormik";
 import { useNavigate } from "react-router-dom";
 import ModalShowEngin from "../../Component/Modal/Engins/ModalShowEngin";
 import ModalQrCode from "../../Component/Modal/Engins/ModalQrCode";
+import "./Engins.css";
 
 const Engin = () => {
   const [isOpenEngin, setIsOpenEngin] = useState<boolean>(false);
@@ -161,7 +162,7 @@ const Engin = () => {
           height="100%"
         >
           <Tooltip
-            title="Afficher"
+            title="Imprimer"
             sx={{
               marginRight: "-15px",
               cursor: "pointer",
