@@ -14,7 +14,7 @@ import {
 import { IoMdDownload } from "react-icons/io";
 
 interface FileBodyProps {
-  clientData: any[];
+  clientData: any;
   columns: any[];
   handleModalOpen: () => void;
   onSelectChange: (value: string) => void;
@@ -61,7 +61,6 @@ const FileBody: React.FC<FileBodyProps> = (props) => {
           pagination: { paginationModel: { pageSize: 9 } },
         }}
         pageSizeOptions={[5, 9, 25]}
-        getRowId={(row) => row.id}
         slots={{
           toolbar: () => (
             <GridToolbarContainer

@@ -14,33 +14,39 @@ import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import Profile from "../../../assets/Profile.webp";
+import { useQuery } from "@tanstack/react-query";
+import { GetByIdProprietaire } from "../../../backEnd/AuthService";
 
-interface ShowModalProps extends addCustumer, showClient {
+interface ShowModalProps extends addCustumer {
   isOpen: boolean;
   handleModalClose: () => void;
+  id: number;
+  role: string;
 }
 
 const ShowModal: React.FC<ShowModalProps> = ({
   isOpen,
   handleModalClose,
-  nom,
-  prenom,
-  email,
   role,
-  dateNaissance,
-  ville,
-  pieceIdentite,
-  sexe,
-  typePiece,
-  nationnalite,
-  numeroTelephone,
+  id,
 }) => {
   const [value, setValue] = React.useState("1");
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+  const {
+    data: dataUser,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["getProprietaireById", id],
+    queryFn: () => GetByIdProprietaire(id),
+    enabled: !!id,
+  });
 
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {(error as Error).message}</div>;
   return (
     <Dialog
       sx={{
@@ -101,14 +107,16 @@ const ShowModal: React.FC<ShowModalProps> = ({
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
                     Nom
                   </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>{nom}</span>
+                  <span style={{ fontSize: "14px", color: "gray" }}>
+                    {dataUser?.user.lastname}
+                  </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
                     Prenom
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {prenom}
+                    {dataUser?.user.firstname}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
@@ -116,7 +124,7 @@ const ShowModal: React.FC<ShowModalProps> = ({
                     Sexe
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {sexe}
+                    {dataUser?.user.sexe}
                   </span>
                 </Grid>
                 <Grid
@@ -150,7 +158,7 @@ const ShowModal: React.FC<ShowModalProps> = ({
                     Numero Telephone
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {numeroTelephone}
+                    {dataUser?.phone}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
@@ -158,7 +166,7 @@ const ShowModal: React.FC<ShowModalProps> = ({
                     Adresse Mail
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {email}
+                    {dataUser?.user.email}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
@@ -166,7 +174,7 @@ const ShowModal: React.FC<ShowModalProps> = ({
                     Date de Naissance
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dateNaissance}
+                    {dataUser?.dateOfBirth}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
@@ -183,7 +191,7 @@ const ShowModal: React.FC<ShowModalProps> = ({
                     Type Piece
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {typePiece}
+                    {dataUser?.typePice}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
@@ -191,7 +199,7 @@ const ShowModal: React.FC<ShowModalProps> = ({
                     Ville de Naissance
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {ville}
+                    {dataUser?.city}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
@@ -199,7 +207,7 @@ const ShowModal: React.FC<ShowModalProps> = ({
                     Nationnalité
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {nationnalite}
+                    {dataUser?.nationality}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
@@ -207,7 +215,7 @@ const ShowModal: React.FC<ShowModalProps> = ({
                     Numero du Piece Identité
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {pieceIdentite}
+                    {dataUser?.pieceNumber}
                   </span>
                 </Grid>
               </Grid>

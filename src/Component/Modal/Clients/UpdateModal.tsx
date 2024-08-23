@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Dialog,
@@ -12,41 +13,140 @@ import {
 } from "@mui/material";
 import * as Yup from "yup";
 import { Form, Formik } from "formik";
-import { addCustumer, showClient } from "../../Interface/InterfaceClient";
+import {
+  CountryType,
+  InitialValuesType,
+  updateClient,
+} from "../../Interface/InterfaceClient";
+import "react-toastify/dist/ReactToastify.css";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
-interface ShowModalProps extends addCustumer, showClient {}
-const UpdateModal: React.FC<ShowModalProps> = ({
+import { countries } from "../../../Data/ClientData";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  GetByIdProprietaire,
+  updateProprietaire,
+} from "../../../backEnd/AuthService";
+import { toast } from "react-toastify";
+
+const UpdateModal: React.FC<updateClient> = ({
+  idClient,
   isOpen,
   handleModalClose,
-  nom,
-  prenom,
-  email,
-  role,
-  dateNaissance,
-  ville,
-  pieceIdentite,
-  sexe,
-  typePiece,
-  nationnalite,
-  numeroTelephone,
 }) => {
+  const notify = () => toast.success("Mise a jour effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("IMise a jour a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
   const SignupSchema = Yup.object().shape({
-    nom: Yup.string().required("Nom est requis"),
-    prenom: Yup.string().required("Prénom est requis"),
-    email: Yup.string().email("Email invalide").required("Email est requis"),
-    role: Yup.string().required("Role est requis"),
-    dateNaissance: Yup.string().required("Date de naissance est requise"),
-    ville: Yup.string().required("Ville est requise"),
-    numeroTelephone: Yup.string().required("Numéro de téléphone est requis"),
+    dateOfBirth: Yup.string().required("Date de naissance est requise"),
+    city: Yup.string().required("Ville est requise"),
+    phone: Yup.string().required("Numéro de téléphone est requis"),
     typePiece: Yup.string().required("Type de pièce est requis"),
-    pieceIdentite: Yup.string().required("Pièce d'identité est requise"),
-    sexe: Yup.string().required("Sexe est requis"),
-    nationnalite: Yup.string().required("Nationalité est requise"),
+    pieceNumber: Yup.string().required("Pièce d'identité est requise"),
+    nationality: Yup.object()
+      .shape({
+        label: Yup.string().required("Label est requis"),
+        code: Yup.string().required("Code est requis"),
+        phone: Yup.string(),
+      })
+      .required("Nationalité est obligatoire"),
+    userId: Yup.number().required("UserID est obligatoire"),
   });
 
-  const handleSubmits = (values: ShowModalProps) => {
-    console.log(values);
+  function formatDateToISO(date: Date, timezoneOffsetHours?: number): string {
+    if (!(date instanceof Date)) {
+      throw new Error("Invalid date object passed to formatDateToISO");
+    }
+
+    const utcDate = new Date(
+      Date.UTC(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        date.getHours() + timezoneOffsetHours! || 0,
+        date.getMinutes(),
+        date.getSeconds()
+      )
+    );
+
+    if (!isNaN(utcDate.getTime())) {
+      return utcDate.toISOString();
+    } else {
+      throw new Error("Invalid date after adjustments");
+    }
+  }
+  const queryClient = useQueryClient();
+  const {
+    data: dataUser,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["getProprietaireByIdClient", idClient],
+    queryFn: () => GetByIdProprietaire(idClient),
+    enabled: !!idClient,
+  });
+
+  const mutation = useMutation({
+    mutationFn: ({ id, userData }: { id: any; userData: any }) =>
+      updateProprietaire(id, userData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["UpdateProprietaire"],
+        exact: true,
+        refetchType: "active",
+      });
+      notify();
+    },
+    onError: (error) => {
+      console.log(error);
+      notifyErreur();
+    },
+  });
+
+  const handleSubmits = (values: any) => {
+    const nationalityLabel = values.nationality ? values.nationality.label : "";
+    const formattedDateOfBirth = formatDateToISO(new Date(values.dateOfBirth));
+
+    const submissionValues = {
+      ...values,
+      nationality: nationalityLabel,
+      userId: values.userId,
+      dateOfBirth: formattedDateOfBirth,
+    };
+    console.log(submissionValues);
+    mutation.mutate(submissionValues);
   };
+
+  const initialValues: InitialValuesType = {
+    userId: dataUser?.userId || 0,
+    dateOfBirth: dataUser?.dateOfBirth || "",
+    city: dataUser?.city || "",
+    phone: dataUser?.phone || "",
+    typePiece: dataUser?.typePiece || "",
+    pieceNumber: dataUser?.pieceNumber || "",
+    nationality: dataUser?.nationality || {
+      label: "",
+      code: "",
+      phone: "",
+    },
+  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {(error as Error).message}</div>;
+  }
+
   return (
     <Dialog
       sx={{
@@ -92,259 +192,201 @@ const UpdateModal: React.FC<ShowModalProps> = ({
 
       <Formik
         onSubmit={handleSubmits}
-        initialValues={{
-          nom: nom,
-          prenom: prenom,
-          email: email,
-          role: role,
-          dateNaissance: dateNaissance,
-          ville: ville,
-          numeroTelephone: numeroTelephone,
-          typePiece: typePiece,
-          pieceIdentite: pieceIdentite,
-          sexe: sexe,
-          nationnalite: nationnalite,
-          isOpen: true,
-          handleModalClose,
-        }}
+        initialValues={initialValues}
         validationSchema={SignupSchema}
       >
-        {({ values, handleChange, handleBlur, touched, errors }) => (
+        {({
+          values,
+          handleChange,
+          handleBlur,
+          touched,
+          errors,
+          setFieldValue,
+        }) => (
           <Form>
             <DialogContent dividers>
               <Box
                 sx={{
-                  p: 1,
+                  p: 2,
                   display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gridTemplateColumns: "repeat(2, 1fr)",
                   gap: "16px",
                 }}
               >
                 <Box>
-                  <label htmlFor="nom" style={{ fontWeight: "bold" }}>
-                    Nom
+                  <label htmlFor="userId" style={{ fontWeight: "bold" }}>
+                    userId
                   </label>
                   <TextField
-                    type="text"
                     size="small"
-                    name="nom"
-                    id="outlined-nomPME"
-                    variant="outlined"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.nom}
-                    error={!!touched.nom && !!errors.nom}
-                    helperText={touched.nom && !!errors.nom}
-                  />
-                </Box>
-                <Box>
-                  <label htmlFor="prenom" style={{ fontWeight: "bold" }}>
-                    Prénom
-                  </label>
-                  <TextField
-                    type="text"
-                    size="small"
-                    name="prenom"
-                    id="outlined-prenomPME"
-                    variant="outlined"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.prenom}
-                    error={!!touched.prenom && !!errors.prenom}
-                    helperText={touched.prenom && !!errors.prenom}
-                  />
-                </Box>
-                <Box>
-                  <label htmlFor="email" style={{ fontWeight: "bold" }}>
-                    Email
-                  </label>
-                  <TextField
-                    type="text"
-                    size="small"
-                    name="email"
-                    id="outlined-email"
-                    variant="outlined"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.email}
-                    error={!!touched.email && !!errors.email}
-                    helperText={touched.email && !!errors.email}
-                  />
-                </Box>
-                <Box>
-                  <label htmlFor="role" style={{ fontWeight: "bold" }}>
-                    Role
-                  </label>
-                  <Select
                     fullWidth
-                    size="small"
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    name="role"
+                    id="outlined-userId"
+                    name="userId"
+                    variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.role}
-                    error={!!touched.role && !!errors.role}
-                  >
-                    {[
-                      "TAXI_MOTO",
-                      "TAXI_VOITURE",
-                      "TAXI_PERSONNELLE",
-                      "MOTO_PERSONNELLE",
-                      "TAXI_VILLE",
-                    ].map((ville) => (
-                      <MenuItem key={ville} value={ville}>
-                        {ville}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                    value={values.userId}
+                    error={!!touched.userId && !!errors.userId}
+                    helperText={touched.userId && errors.userId}
+                    sx={{ height: "40px" }}
+                  />
                 </Box>
                 <Box>
-                  <label htmlFor="" style={{ fontWeight: "bold" }}>
+                  <label htmlFor="dateOfBirth" style={{ fontWeight: "bold" }}>
                     Date naissance
                   </label>
                   <TextField
-                    fullWidth
                     size="small"
+                    fullWidth
                     type="date"
-                    name="dateNaissance"
-                    id="outlined-dateNaissance"
+                    id="outlined-dateOfBirth"
+                    name="dateOfBirth"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.dateNaissance}
-                    error={!!touched.dateNaissance && !!errors.dateNaissance}
-                    helperText={touched.dateNaissance && !!errors.dateNaissance}
+                    value={values.dateOfBirth}
+                    error={!!touched.dateOfBirth && !!errors.dateOfBirth}
+                    helperText={touched.dateOfBirth && errors.dateOfBirth}
+                    sx={{ height: "40px" }}
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="ville" style={{ fontWeight: "bold" }}>
+                  <label htmlFor="city" style={{ fontWeight: "bold" }}>
                     Ville
                   </label>
                   <TextField
                     size="small"
-                    id="outlined-ville"
-                    name="ville"
+                    fullWidth
+                    id="outlined-city"
+                    name="city"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.ville}
-                    error={!!touched.ville && !!errors.ville}
-                    helperText={touched.ville && !!errors.ville}
+                    value={values.city}
+                    error={!!touched.city && !!errors.city}
+                    helperText={touched.city && errors.city}
+                    sx={{ height: "40px" }}
                   />
                 </Box>
                 <Box>
-                  <label
-                    htmlFor="numeroTelephone"
-                    style={{ fontWeight: "bold" }}
-                  >
+                  <label htmlFor="phone" style={{ fontWeight: "bold" }}>
                     Numero Telephone
                   </label>
                   <TextField
                     size="small"
-                    name="numeroTelephone"
-                    id="outlined-numeroTelephone"
+                    fullWidth
+                    id="outlined-phone"
+                    name="phone"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.numeroTelephone}
-                    error={
-                      !!touched.numeroTelephone && !!errors.numeroTelephone
-                    }
-                    helperText={
-                      touched.numeroTelephone && !!errors.numeroTelephone
-                    }
+                    value={values.phone}
+                    error={!!touched.phone && !!errors.phone}
+                    helperText={touched.phone && errors.phone}
+                    sx={{ height: "40px" }}
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="pieceIdentite" style={{ fontWeight: "bold" }}>
+                  <label htmlFor="pieceNumber" style={{ fontWeight: "bold" }}>
                     N° Piece Identité
                   </label>
                   <TextField
                     size="small"
-                    name="pieceIdentite"
-                    id="outlined-pieceIdentite"
+                    fullWidth
+                    id="outlined-pieceNumber"
+                    name="pieceNumber"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.pieceIdentite}
-                    error={!!touched.pieceIdentite && !!errors.pieceIdentite}
-                    helperText={touched.pieceIdentite && !!errors.pieceIdentite}
+                    value={values.pieceNumber}
+                    error={!!touched.pieceNumber && !!errors.pieceNumber}
+                    helperText={touched.pieceNumber && errors.pieceNumber}
+                    sx={{ height: "40px" }}
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="role" style={{ fontWeight: "bold" }}>
+                  <label htmlFor="typePiece" style={{ fontWeight: "bold" }}>
                     Type Piece Identité
                   </label>
-                  <Select
-                    fullWidth
-                    size="small"
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    name="role"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.role}
-                    error={!!touched.role && !!errors.role}
-                  >
-                    {["PASSEPORT", "CARTE IDENTITE", "CARTE ELECTEUR"].map(
-                      (piece) => (
-                        <MenuItem key={piece} value={piece}>
-                          {piece}
-                        </MenuItem>
-                      )
-                    )}
-                  </Select>
-                </Box>
-                <Box>
-                  <label htmlFor="sexe" style={{ fontWeight: "bold" }}>
-                    Sexe
-                  </label>
-                  <FormControl size="small" fullWidth>
+                  <FormControl fullWidth size="small">
                     <Select
-                      labelId="sexe-label"
-                      id="sexe"
-                      name="sexe"
+                      labelId="select-typePiece"
+                      id="select-typePiece"
+                      name="typePiece"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      value={values.sexe}
-                      error={!!touched.sexe && !!errors.sexe}
+                      value={values.typePiece}
+                      error={!!touched.typePiece && !!errors.typePiece}
+                      sx={{ height: "40px" }}
                     >
-                      <MenuItem value="Masculin">Masculin</MenuItem>
-                      <MenuItem value="Feminin">Feminin</MenuItem>
+                      {["PASSPORT", "CARTE IDENTITE", "CARTE ELECTEUR"].map(
+                        (piece) => (
+                          <MenuItem key={piece} value={piece}>
+                            {piece}
+                          </MenuItem>
+                        )
+                      )}
                     </Select>
                   </FormControl>
                 </Box>
                 <Box>
-                  <label htmlFor="role" style={{ fontWeight: "bold" }}>
-                    Type Piece Identité
+                  <label htmlFor="nationality" style={{ fontWeight: "bold" }}>
+                    Nationalité
                   </label>
-                  <Select
-                    fullWidth
-                    size="small"
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    name="role"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.role}
-                    error={!!touched.role && !!errors.role}
-                  >
-                    {[
-                      "GUINEE",
-                      "MALI",
-                      "SENEGAL",
-                      "BURKINA FASSO",
-                      "COTE D'IVOIRE",
-                    ].map((piece) => (
-                      <MenuItem key={piece} value={piece}>
-                        {piece}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <Autocomplete
+                    id="country-select-demo"
+                    options={countries}
+                    getOptionLabel={(option: CountryType) =>
+                      option.label || "Unknown Country"
+                    }
+                    value={values.nationality}
+                    isOptionEqualToValue={(option, value) =>
+                      option.code === value?.code
+                    }
+                    onChange={(event, value: CountryType | null) => {
+                      setFieldValue("nationality", value);
+                    }}
+                    renderOption={(props, option) => (
+                      <Box
+                        component="li"
+                        sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                        {...props}
+                      >
+                        <img
+                          loading="lazy"
+                          width="20"
+                          srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                          src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                          alt=""
+                        />
+                        {option.label} ({option.code}) +{option.phone}
+                      </Box>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        inputProps={{
+                          ...params.inputProps,
+                          autoComplete: "new-password",
+                        }}
+                        size="small"
+                        fullWidth
+                        name="nationality"
+                        variant="outlined"
+                        error={!!touched.nationality && !!errors.nationality}
+                        helperText={
+                          touched.nationality && errors.nationality
+                            ? String(errors.nationality)
+                            : undefined
+                        }
+                        sx={{ height: "40px" }}
+                      />
+                    )}
+                  />
                 </Box>
               </Box>
             </DialogContent>
+
             <DialogActions
               sx={{
                 justifyContent: "space-between",
@@ -366,7 +408,6 @@ const UpdateModal: React.FC<ShowModalProps> = ({
                   "&:hover": {
                     bgcolor: "black",
                     color: "white",
-                    height: "36px",
                   },
                 }}
                 onClick={handleModalClose}
@@ -386,7 +427,6 @@ const UpdateModal: React.FC<ShowModalProps> = ({
                   "&:hover": {
                     bgcolor: "black",
                     color: "white",
-                    height: "36px",
                   },
                 }}
               >

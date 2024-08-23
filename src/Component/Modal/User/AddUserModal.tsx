@@ -69,14 +69,24 @@ const AddUserModal = ({ isOpen, handleClose }: ToggleModal) => {
   if (error) return <div>Error: {(error as Error).message}</div>;
 
   const handleSubmit = (values: User) => {
+    console.log(values);
     const transformedValues = {
       ...values,
       roleId: selectedRoleId ? [selectedRoleId] : [],
       password: "123456789",
     };
-    console.log("les data:", transformedValues);
-    mutation.mutate(transformedValues);
+    console.log("Valeurs soumises:", transformedValues);
+
+    mutation.mutate(transformedValues, {
+      onSuccess: () => {
+        console.log("Mutation réussie!");
+      },
+      onError: (error) => {
+        console.log("Erreur de mutation:", error);
+      },
+    });
   };
+
   return (
     <Dialog
       sx={{
@@ -229,9 +239,10 @@ const AddUserModal = ({ isOpen, handleClose }: ToggleModal) => {
                     onBlur={handleBlur}
                     onChange={(e) => {
                       handleChange(e);
+                      // Assurez-vous que la valeur du select est bien synchronisée avec Formik
                       setSelectedRoleId(Number(e.target.value));
                     }}
-                    value={selectedRoleId || ""}
+                    value={values.role || ""} // Synchronisez avec Formik
                     error={!!touched.role && !!errors.role}
                   >
                     <MenuItem value="" disabled>

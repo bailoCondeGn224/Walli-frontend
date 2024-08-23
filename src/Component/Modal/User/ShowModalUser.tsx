@@ -16,24 +16,30 @@ import { Formik, Form } from "formik";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import { UpdateModalUserProps, User } from "../../Interface/InterfaceClient";
 import { userSchema } from "../../Helper/InitialevalueFormik";
-
-const initialUserValues = {
-  firstname: "",
-  lastname: "",
-  username: "",
-  sexe: "",
-  email: "",
-  role: "",
-};
+import { useQuery } from "@tanstack/react-query";
+import { GetAllUsers } from "../../../backEnd/AuthService";
 
 const ShowModalUser = ({
   isOpen,
   handleClose,
   initialUserValues,
+  id,
 }: UpdateModalUserProps) => {
   const handleSubmit = (values: User) => {
     console.log(values);
   };
+
+  const {
+    data: dataUser,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["getAllUsers"],
+    queryFn: GetAllUsers,
+  });
+  const filteredUsers: User[] =
+    dataUser?.filter((user) => user.id === id) ?? [];
+  const filteredUser = filteredUsers.length > 0 ? filteredUsers[0] : null;
 
   return (
     <Dialog
@@ -105,7 +111,7 @@ const ShowModalUser = ({
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.firstname}
+                    value={filteredUser?.firstname}
                     error={!!touched.firstname && !!errors.firstname}
                     // helperText={touched.firstname && errors.firstname}
                   />
@@ -122,7 +128,7 @@ const ShowModalUser = ({
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.lastname}
+                    value={filteredUser?.lastname}
                     error={!!touched.lastname && !!errors.lastname}
                     // helperText={touched.lastname && errors.lastname}
                   />
@@ -139,31 +145,10 @@ const ShowModalUser = ({
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.username}
+                    value={filteredUser?.username}
                     error={!!touched.username && !!errors.username}
                     // helperText={touched.username && errors.username}
                   />
-                </Box>
-                <Box>
-                  <label htmlFor="sexe">Sexe</label>
-                  <Select
-                    disabled
-                    fullWidth
-                    size="small"
-                    id="outlined-sexe"
-                    name="sexe"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.sexe}
-                    error={!!touched.sexe && !!errors.sexe}
-                    displayEmpty
-                  >
-                    <MenuItem value="" disabled>
-                      Sélectionner le sexe
-                    </MenuItem>
-                    <MenuItem value="M">M</MenuItem>
-                    <MenuItem value="F">F</MenuItem>
-                  </Select>
                 </Box>
                 <Box>
                   <label htmlFor="email">Email</label>
@@ -177,12 +162,40 @@ const ShowModalUser = ({
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.email}
+                    value={filteredUser?.email}
                     error={!!touched.email && !!errors.email}
                     // helperText={touched.email && errors.email}
                   />
                 </Box>
                 <Box>
+                  <label htmlFor="sexe">Sexe</label>
+                  <TextField
+                    disabled
+                    fullWidth
+                    size="small"
+                    id="outlined-sexe"
+                    name="sexe"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={filteredUser?.sexe}
+                    error={!!touched.sexe && !!errors.sexe}
+                  />
+                </Box>
+                <Box>
+                  <label htmlFor="role">Role</label>
+                  <TextField
+                    disabled
+                    fullWidth
+                    size="small"
+                    id="outlined-role"
+                    name="roles"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={filteredUser?.roles[0]}
+                    error={!!touched.role && !!errors.role}
+                  />
+                </Box>
+                {/* <Box>
                   <label htmlFor="role">Rôle</label>
                   <Select
                     disabled
@@ -192,7 +205,7 @@ const ShowModalUser = ({
                     name="role"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.role}
+                    value={filteredUser?.role}
                     error={!!touched.role && !!errors.role}
                   >
                     <MenuItem value="" disabled>
@@ -211,7 +224,7 @@ const ShowModalUser = ({
                       </MenuItem>
                     ))}
                   </Select>
-                </Box>
+                </Box> */}
               </Box>
             </DialogContent>
 

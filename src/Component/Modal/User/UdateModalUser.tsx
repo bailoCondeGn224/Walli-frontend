@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -13,18 +13,97 @@ import {
 import { Formik, Form } from "formik";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import { userSchema } from "../../Helper/InitialevalueFormik";
-import { UpdateModalUserProps, User } from "../../Interface/InterfaceClient";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  UpdateModalUserProps,
+  User,
+  UserUpdate,
+} from "../../Interface/InterfaceClient";
+
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  GetAllRoles,
+  GetAllUsers,
+  updateUser,
+} from "../../../backEnd/AuthService";
+import { toast } from "react-toastify";
 
 const UpdateModalUser: React.FC<UpdateModalUserProps> = ({
   isOpen,
   handleClose,
   initialUserValues,
+  id,
 }) => {
-  const handleSubmit = (values: User) => {
-    console.log(values);
-    // Mettre à jour l'utilisateur ici
+  const {
+    data: dataUser,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["getAllUsers"],
+    queryFn: GetAllUsers,
+  });
+
+  const filteredUsers: User[] =
+    dataUser?.filter((user) => user.id === id) ?? [];
+  const filteredUser = filteredUsers.length > 0 ? filteredUsers[0] : null;
+  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
+  const [initialValues, setInitialValues] = useState<any>(initialUserValues);
+  const queryClient = useQueryClient();
+  const notify = () => toast.success("Mise a jours  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Mise a jour a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  useEffect(() => {
+    if (filteredUser) {
+      setInitialValues(filteredUser);
+    }
+  }, [filteredUser]);
+
+  const mutation = useMutation({
+    mutationFn: (user: any) => updateUser(id, user),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getAllUsers"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error: any) => {
+      notifyErreur();
+      handleClose();
+    },
+  });
+
+  const handleSubmit = (values: UserUpdate) => {
+    const { id, roles, ...restvalue } = values;
+    const transformedValues = {
+      ...restvalue,
+      roleId: roles,
+    };
+    console.log(transformedValues);
+    mutation.mutate(transformedValues);
   };
-  console.log(isOpen, "isopen modal");
+  const { data: roles } = useQuery({
+    queryKey: ["getAllRoles"],
+    queryFn: GetAllRoles,
+  });
+
   return (
     <Dialog
       sx={{
@@ -69,8 +148,9 @@ const UpdateModalUser: React.FC<UpdateModalUserProps> = ({
 
       <Formik
         onSubmit={handleSubmit}
-        initialValues={initialUserValues}
+        initialValues={initialValues}
         validationSchema={userSchema}
+        enableReinitialize
       >
         {({ values, handleChange, handleBlur, touched, errors }) => (
           <Form>
@@ -147,8 +227,8 @@ const UpdateModalUser: React.FC<UpdateModalUserProps> = ({
                     <MenuItem value="" disabled>
                       Sélectionner le sexe
                     </MenuItem>
-                    <MenuItem value="M">M</MenuItem>
-                    <MenuItem value="F">F</MenuItem>
+                    <MenuItem value="masculin">Masculin</MenuItem>
+                    <MenuItem value="feminin">Feminin</MenuItem>
                   </Select>
                 </Box>
                 <Box>
@@ -173,25 +253,18 @@ const UpdateModalUser: React.FC<UpdateModalUserProps> = ({
                     fullWidth
                     size="small"
                     id="outlined-role"
-                    name="role"
+                    name="roles"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.role}
-                    error={!!touched.role && !!errors.role}
+                    value={values.roles}
+                    error={!!touched.roles && !!errors.roles}
                   >
                     <MenuItem value="" disabled>
                       Sélectionner un rôle
                     </MenuItem>
-                    {[
-                      "Admin",
-                      "User",
-                      "Chef Service",
-                      "Super Admin",
-                      "Testeur",
-                      "Manager",
-                    ].map((role) => (
-                      <MenuItem key={role} value={role}>
-                        {role}
+                    {roles?.map((role: any) => (
+                      <MenuItem key={role.id} value={role.roleId}>
+                        {role.nameRole}
                       </MenuItem>
                     ))}
                   </Select>

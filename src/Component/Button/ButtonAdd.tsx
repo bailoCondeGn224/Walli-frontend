@@ -14,6 +14,11 @@ import { DatePicker } from "@mui/lab";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { DeleteUser } from "../../backEnd/AuthService";
+import "react-toastify/dist/ReactToastify.css";
+
+import { toast } from "react-toastify";
 interface ButtonAddProps {
   onClick: () => void;
 }
@@ -21,6 +26,7 @@ interface ButtonAddProps {
 interface ButtonDelete {
   isOpen: boolean;
   handleClose: () => void;
+  idItem: any;
 }
 
 export const ButtonAdd: React.FC<ButtonAddProps> = ({ onClick }) => {
@@ -111,22 +117,49 @@ export const ButtonSelectSeach: React.FC<ButtonSelectSeachProps> = ({
 export const DeleteModal: React.FC<ButtonDelete> = ({
   isOpen,
   handleClose,
+  idItem,
 }) => {
-  const style = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 426,
-    bgcolor: "background.paper",
-    border: "none",
-    boxShadow: 24,
-    p: 1,
+  const queryClient = useQueryClient();
+
+  const notify = () => toast.success("Suppression  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Suppression a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  // Mutation pour supprimer un utilisateur
+  const mutation = useMutation({
+    mutationFn: (id: number) => DeleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getAllUsers"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error);
+      notifyErreur();
+    },
+  });
+
+  const handleDelete = () => {
+    mutation.mutate(idItem);
   };
 
   return (
     <Modal
       open={isOpen}
+      onClose={handleClose}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -141,11 +174,10 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Confirmation
           </Typography>
-
           <Button onClick={handleClose}>
             <CancelPresentationIcon
               sx={{
-                color: "rgba(0, 0, 160, 0.70) ",
+                color: "rgba(0, 0, 160, 0.70)",
                 width: "30px",
                 height: "30px",
               }}
@@ -153,7 +185,7 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
           </Button>
         </Box>
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Etes vous sur de vouloir supprimer cet élément?
+          Etes-vous sûr de vouloir supprimer cet élément ?
           <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
             Cette action est irréversible
           </Typography>
@@ -188,7 +220,6 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
               Annuler
             </Button>
             <Button
-              type="submit"
               variant="outlined"
               sx={{
                 bgcolor: "rgba(0, 0, 160, 0.70)",
@@ -203,6 +234,8 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
                   height: "30px",
                 },
               }}
+              onClick={handleDelete}
+              // disabled={mutation.isLoading}
             >
               Confirmer
             </Button>
@@ -211,6 +244,19 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
       </Box>
     </Modal>
   );
+};
+
+// Style object for the modal (you might want to define it outside of the component)
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 426,
+  bgcolor: "background.paper",
+  border: "none",
+  boxShadow: 24,
+  p: 1,
 };
 
 export const DateButtonSelected = () => {

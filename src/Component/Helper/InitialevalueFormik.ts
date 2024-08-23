@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { User } from "../Interface/InterfaceClient";
+import { InitialValuesType, User } from "../Interface/InterfaceClient";
 
 export const initialValuesEngin = {
   id: 0,
