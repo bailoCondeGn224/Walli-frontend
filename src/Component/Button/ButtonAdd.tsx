@@ -15,7 +15,16 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { DeleteUser } from "../../backEnd/AuthService";
+import {
+  DeleteDestination,
+  DeleteEngin,
+  DeleteGare,
+  DeleteLine,
+  DeletePassager,
+  DeleteProprietaire,
+  DeleteSyndicat,
+  DeleteUser,
+} from "../../backEnd/AuthService";
 import "react-toastify/dist/ReactToastify.css";
 
 import { toast } from "react-toastify";
@@ -140,6 +149,930 @@ export const DeleteModal: React.FC<ButtonDelete> = ({
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getAllUsers"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error);
+      notifyErreur();
+    },
+  });
+
+  const handleDelete = () => {
+    mutation.mutate(idItem);
+  };
+
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirmation
+          </Typography>
+          <Button onClick={handleClose}>
+            <CancelPresentationIcon
+              sx={{
+                color: "rgba(0, 0, 160, 0.70)",
+                width: "30px",
+                height: "30px",
+              }}
+            />
+          </Button>
+        </Box>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          Etes-vous sûr de vouloir supprimer cet élément ?
+          <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
+            Cette action est irréversible
+          </Typography>
+        </Typography>
+        <Box>
+          <DialogActions
+            sx={{
+              justifyContent: "space-between",
+              marginTop: "15px",
+              mr: 0,
+              ml: 0,
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "#F33E3E",
+                color: "white",
+                ml: "5px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                height: "30px",
+                width: "153px",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "rgba(0, 0, 160, 0.70)",
+                borderRadius: "5px",
+                height: "30px",
+                color: "white",
+                width: "153px",
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleDelete}
+              // disabled={mutation.isLoading}
+            >
+              Confirmer
+            </Button>
+          </DialogActions>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
+export const DeleteModalPropriataire: React.FC<ButtonDelete> = ({
+  isOpen,
+  handleClose,
+  idItem,
+}) => {
+  const queryClient = useQueryClient();
+
+  const notify = () => toast.success("Suppression  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Suppression a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  // Mutation pour supprimer un utilisateur
+  const mutation = useMutation({
+    mutationFn: (id: number) => DeleteProprietaire(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["proprietaireid"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error);
+      notifyErreur();
+    },
+  });
+
+  const handleDelete = () => {
+    mutation.mutate(idItem);
+  };
+
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirmation
+          </Typography>
+          <Button onClick={handleClose}>
+            <CancelPresentationIcon
+              sx={{
+                color: "rgba(0, 0, 160, 0.70)",
+                width: "30px",
+                height: "30px",
+              }}
+            />
+          </Button>
+        </Box>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          Etes-vous sûr de vouloir supprimer cet élément ?
+          <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
+            Cette action est irréversible
+          </Typography>
+        </Typography>
+        <Box>
+          <DialogActions
+            sx={{
+              justifyContent: "space-between",
+              marginTop: "15px",
+              mr: 0,
+              ml: 0,
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "#F33E3E",
+                color: "white",
+                ml: "5px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                height: "30px",
+                width: "153px",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "rgba(0, 0, 160, 0.70)",
+                borderRadius: "5px",
+                height: "30px",
+                color: "white",
+                width: "153px",
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleDelete}
+              // disabled={mutation.isLoading}
+            >
+              Confirmer
+            </Button>
+          </DialogActions>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
+export const DeleteModalSyndicat: React.FC<ButtonDelete> = ({
+  isOpen,
+  handleClose,
+  idItem,
+}) => {
+  const queryClient = useQueryClient();
+
+  const notify = () => toast.success("Suppression  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Suppression a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  // Mutation pour supprimer un utilisateur
+  const mutation = useMutation({
+    mutationFn: (id: number) => DeleteSyndicat(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["syndicat"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error);
+      notifyErreur();
+    },
+  });
+
+  const handleDelete = () => {
+    mutation.mutate(idItem);
+  };
+
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirmation
+          </Typography>
+          <Button onClick={handleClose}>
+            <CancelPresentationIcon
+              sx={{
+                color: "rgba(0, 0, 160, 0.70)",
+                width: "30px",
+                height: "30px",
+              }}
+            />
+          </Button>
+        </Box>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          Etes-vous sûr de vouloir supprimer cet élément ?
+          <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
+            Cette action est irréversible
+          </Typography>
+        </Typography>
+        <Box>
+          <DialogActions
+            sx={{
+              justifyContent: "space-between",
+              marginTop: "15px",
+              mr: 0,
+              ml: 0,
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "#F33E3E",
+                color: "white",
+                ml: "5px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                height: "30px",
+                width: "153px",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "rgba(0, 0, 160, 0.70)",
+                borderRadius: "5px",
+                height: "30px",
+                color: "white",
+                width: "153px",
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleDelete}
+              // disabled={mutation.isLoading}
+            >
+              Confirmer
+            </Button>
+          </DialogActions>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
+export const DeleteModalEngin: React.FC<ButtonDelete> = ({
+  isOpen,
+  handleClose,
+  idItem,
+}) => {
+  const queryClient = useQueryClient();
+
+  const notify = () => toast.success("Suppression  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Suppression a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  // Mutation pour supprimer un utilisateur
+  const mutation = useMutation({
+    mutationFn: (id: number) => DeleteEngin(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getEngin"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error);
+      notifyErreur();
+    },
+  });
+
+  const handleDelete = () => {
+    mutation.mutate(idItem);
+  };
+
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirmation
+          </Typography>
+          <Button onClick={handleClose}>
+            <CancelPresentationIcon
+              sx={{
+                color: "rgba(0, 0, 160, 0.70)",
+                width: "30px",
+                height: "30px",
+              }}
+            />
+          </Button>
+        </Box>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          Etes-vous sûr de vouloir supprimer cet élément ?
+          <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
+            Cette action est irréversible
+          </Typography>
+        </Typography>
+        <Box>
+          <DialogActions
+            sx={{
+              justifyContent: "space-between",
+              marginTop: "15px",
+              mr: 0,
+              ml: 0,
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "#F33E3E",
+                color: "white",
+                ml: "5px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                height: "30px",
+                width: "153px",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "rgba(0, 0, 160, 0.70)",
+                borderRadius: "5px",
+                height: "30px",
+                color: "white",
+                width: "153px",
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleDelete}
+              // disabled={mutation.isLoading}
+            >
+              Confirmer
+            </Button>
+          </DialogActions>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
+export const DeleteModalLine: React.FC<ButtonDelete> = ({
+  isOpen,
+  handleClose,
+  idItem,
+}) => {
+  const queryClient = useQueryClient();
+
+  const notify = () => toast.success("Suppression  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Suppression a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  // Mutation pour supprimer un utilisateur
+  const mutation = useMutation({
+    mutationFn: (id: number) => DeleteLine(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getLine"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error);
+      notifyErreur();
+    },
+  });
+
+  const handleDelete = () => {
+    mutation.mutate(idItem);
+  };
+
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirmation
+          </Typography>
+          <Button onClick={handleClose}>
+            <CancelPresentationIcon
+              sx={{
+                color: "rgba(0, 0, 160, 0.70)",
+                width: "30px",
+                height: "30px",
+              }}
+            />
+          </Button>
+        </Box>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          Etes-vous sûr de vouloir supprimer cet élément ?
+          <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
+            Cette action est irréversible
+          </Typography>
+        </Typography>
+        <Box>
+          <DialogActions
+            sx={{
+              justifyContent: "space-between",
+              marginTop: "15px",
+              mr: 0,
+              ml: 0,
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "#F33E3E",
+                color: "white",
+                ml: "5px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                height: "30px",
+                width: "153px",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "rgba(0, 0, 160, 0.70)",
+                borderRadius: "5px",
+                height: "30px",
+                color: "white",
+                width: "153px",
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleDelete}
+              // disabled={mutation.isLoading}
+            >
+              Confirmer
+            </Button>
+          </DialogActions>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
+export const DeleteModalGare: React.FC<ButtonDelete> = ({
+  isOpen,
+  handleClose,
+  idItem,
+}) => {
+  const queryClient = useQueryClient();
+
+  const notify = () => toast.success("Suppression  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Suppression a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  // Mutation pour supprimer un utilisateur
+  const mutation = useMutation({
+    mutationFn: (id: number) => DeleteGare(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getGare"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error);
+      notifyErreur();
+    },
+  });
+
+  const handleDelete = () => {
+    mutation.mutate(idItem);
+  };
+
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirmation
+          </Typography>
+          <Button onClick={handleClose}>
+            <CancelPresentationIcon
+              sx={{
+                color: "rgba(0, 0, 160, 0.70)",
+                width: "30px",
+                height: "30px",
+              }}
+            />
+          </Button>
+        </Box>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          Etes-vous sûr de vouloir supprimer cet élément ?
+          <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
+            Cette action est irréversible
+          </Typography>
+        </Typography>
+        <Box>
+          <DialogActions
+            sx={{
+              justifyContent: "space-between",
+              marginTop: "15px",
+              mr: 0,
+              ml: 0,
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "#F33E3E",
+                color: "white",
+                ml: "5px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                height: "30px",
+                width: "153px",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "rgba(0, 0, 160, 0.70)",
+                borderRadius: "5px",
+                height: "30px",
+                color: "white",
+                width: "153px",
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleDelete}
+              // disabled={mutation.isLoading}
+            >
+              Confirmer
+            </Button>
+          </DialogActions>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
+export const DeleteModalDestionation: React.FC<ButtonDelete> = ({
+  isOpen,
+  handleClose,
+  idItem,
+}) => {
+  const queryClient = useQueryClient();
+
+  const notify = () => toast.success("Suppression  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Suppression a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  // Mutation pour supprimer un utilisateur
+  const mutation = useMutation({
+    mutationFn: (id: number) => DeleteDestination(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getDestination"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleClose();
+      notify();
+    },
+    onError: (error) => {
+      console.error("Erreur lors de la suppression :", error);
+      notifyErreur();
+    },
+  });
+
+  const handleDelete = () => {
+    mutation.mutate(idItem);
+  };
+
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirmation
+          </Typography>
+          <Button onClick={handleClose}>
+            <CancelPresentationIcon
+              sx={{
+                color: "rgba(0, 0, 160, 0.70)",
+                width: "30px",
+                height: "30px",
+              }}
+            />
+          </Button>
+        </Box>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          Etes-vous sûr de vouloir supprimer cet élément ?
+          <Typography color="rgba(0, 0, 160, 0.70)" sx={{ fontSize: "14px" }}>
+            Cette action est irréversible
+          </Typography>
+        </Typography>
+        <Box>
+          <DialogActions
+            sx={{
+              justifyContent: "space-between",
+              marginTop: "15px",
+              mr: 0,
+              ml: 0,
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "#F33E3E",
+                color: "white",
+                ml: "5px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                height: "30px",
+                width: "153px",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleClose}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                bgcolor: "rgba(0, 0, 160, 0.70)",
+                borderRadius: "5px",
+                height: "30px",
+                color: "white",
+                width: "153px",
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "black",
+                  color: "white",
+                  height: "30px",
+                },
+              }}
+              onClick={handleDelete}
+              // disabled={mutation.isLoading}
+            >
+              Confirmer
+            </Button>
+          </DialogActions>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
+export const DeleteModalPassager: React.FC<ButtonDelete> = ({
+  isOpen,
+  handleClose,
+  idItem,
+}) => {
+  const queryClient = useQueryClient();
+
+  const notify = () => toast.success("Suppression  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Suppression a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  // Mutation pour supprimer un utilisateur
+  const mutation = useMutation({
+    mutationFn: (id: number) => DeletePassager(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getPassager"],
         exact: true,
         refetchType: "active",
       });

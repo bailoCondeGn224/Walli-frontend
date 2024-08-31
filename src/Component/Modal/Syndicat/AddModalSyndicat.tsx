@@ -6,39 +6,19 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  MenuItem,
-  Select,
   TextField,
 } from "@mui/material";
 import { Form, Formik } from "formik";
-import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
-import * as Yup from "yup";
 import "react-toastify/dist/ReactToastify.css";
-import { addCustumer, CountryType } from "../../Interface/InterfaceClient";
+import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import { countries } from "../../../Data/ClientData";
+import { addCustumer, CountryType } from "../../Interface/InterfaceClient";
+import { SignupSchema } from "../../Helper/InitialevalueFormik";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AddProprietaire } from "../../../backEnd/AuthService";
 import { toast } from "react-toastify";
+import { AddSyndicat } from "../../../backEnd/AuthService";
 
-// Exemple de validation Schema
-const SignupSchema = Yup.object().shape({
-  dateOfBirth: Yup.string().required("Date de naissance est requise"),
-  city: Yup.string().required("Ville est requise"),
-  phone: Yup.string().required("Numéro de téléphone est requis"),
-  typePice: Yup.string().required("Type de pièce est requis"),
-  pieceNumber: Yup.string().required("Pièce d'identité est requise"),
-  nationality: Yup.object()
-    .shape({
-      label: Yup.string(),
-      code: Yup.string(),
-      phone: Yup.string(),
-    })
-    .required("Nationalité est obligatoire"),
-  userId: Yup.number().required("UserID est obligatoire"),
-});
-
-const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
+const AddModalSyndicat = ({ isOpen, handleModalClose, id }: addCustumer) => {
   const notify = () => toast.success("Insertion  effectuée avec succès!");
   const notifyErreur = () =>
     toast.error("Insertion a echouée", {
@@ -51,14 +31,13 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
       progress: undefined,
       theme: "light",
     });
-
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: AddProprietaire,
+    mutationFn: AddSyndicat,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["proprietaireid"],
+        queryKey: ["syndicat"],
         exact: true,
         refetchType: "active",
       });
@@ -71,42 +50,15 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
       handleModalClose();
     },
   });
-
-  function formatDateToISO(date: Date, timezoneOffsetHours?: number): string {
-    if (!(date instanceof Date)) {
-      throw new Error("Invalid date object passed to formatDateToISO");
-    }
-
-    const utcDate = new Date(
-      Date.UTC(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        date.getHours() + timezoneOffsetHours! || 0,
-        date.getMinutes(),
-        date.getSeconds()
-      )
-    );
-
-    if (!isNaN(utcDate.getTime())) {
-      return utcDate.toISOString();
-    } else {
-      throw new Error("Invalid date after adjustments");
-    }
-  }
-
   const handleSubmits = (values: any) => {
     const userIdAsNumber = parseInt(values.userId, 10);
-    const nationalityLabel = values.nationality ? values.nationality.label : "";
-
-    const formattedDateOfBirth = formatDateToISO(new Date(values.dateOfBirth));
-    console.log("la date:", formattedDateOfBirth);
+    const nationalityLabel = values.pays ? values.pays.label : "";
     const submissionValues = {
       ...values,
       nationality: nationalityLabel,
       userId: userIdAsNumber,
-      dateOfBirth: formattedDateOfBirth,
     };
+    console.log(submissionValues);
     mutation.mutate(submissionValues);
   };
 
@@ -114,12 +66,14 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
     <Dialog
       sx={{
         "& .MuiDialog-paper": {
-          width: "60%",
+          width: "50%",
+          maxWidth: "md",
           maxHeight: 600,
           background: "white",
+          padding: 2,
         },
       }}
-      maxWidth="lg"
+      maxWidth="md"
       open={isOpen}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
@@ -129,7 +83,7 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          ml: 1.3,
+          mb: 2,
         }}
       >
         <DialogTitle
@@ -140,7 +94,7 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
           Enregistrement d'un client
         </DialogTitle>
         <Button
-          sx={{ fontSize: "1.3rem", fontWeight: "bold", mr: 1.5 }}
+          sx={{ fontSize: "1.3rem", fontWeight: "bold" }}
           onClick={handleModalClose}
         >
           <CancelPresentationIcon
@@ -158,11 +112,10 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
         initialValues={{
           userId: 0,
           dateOfBirth: "",
-          city: "",
+          quartier: "",
+          ville: "",
           phone: "",
-          typePice: "",
-          pieceNumber: "",
-          nationality: { label: "", code: "", phone: "" },
+          pays: { label: "", code: "", phone: "" },
         }}
         validationSchema={SignupSchema}
       >
@@ -178,20 +131,22 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
             <DialogContent dividers>
               <Box
                 sx={{
-                  p: 2,
                   display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gridTemplateColumns: "repeat(1, 1fr)",
                   gap: "16px",
+                  "@media (min-width:600px)": {
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                  },
                 }}
               >
                 <Box>
                   <label htmlFor="userId" style={{ fontWeight: "bold" }}>
-                    userId
+                    User ID
                   </label>
                   <TextField
                     size="small"
                     fullWidth
-                    id="outlined-userId"
+                    id="userId"
                     name="userId"
                     variant="outlined"
                     onBlur={handleBlur}
@@ -204,13 +159,13 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
                 </Box>
                 <Box>
                   <label htmlFor="dateOfBirth" style={{ fontWeight: "bold" }}>
-                    Date naissance
+                    Date de naissance
                   </label>
                   <TextField
                     size="small"
                     fullWidth
                     type="date"
-                    id="outlined-dateOfBirth"
+                    id="dateOfBirth"
                     name="dateOfBirth"
                     variant="outlined"
                     onBlur={handleBlur}
@@ -222,31 +177,49 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
                   />
                 </Box>
                 <Box>
+                  <label htmlFor="quartier" style={{ fontWeight: "bold" }}>
+                    Quartier
+                  </label>
+                  <TextField
+                    size="small"
+                    fullWidth
+                    id="quartier"
+                    name="quartier"
+                    variant="outlined"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.quartier}
+                    error={!!touched.quartier && !!errors.quartier}
+                    helperText={touched.quartier && errors.quartier}
+                    sx={{ height: "40px" }}
+                  />
+                </Box>
+                <Box>
                   <label htmlFor="ville" style={{ fontWeight: "bold" }}>
                     Ville
                   </label>
                   <TextField
                     size="small"
                     fullWidth
-                    id="outlined-city"
-                    name="city"
+                    id="ville"
+                    name="ville"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.city}
-                    error={!!touched.city && !!errors.city}
-                    helperText={touched.city && errors.city}
+                    value={values.ville}
+                    error={!!touched.ville && !!errors.ville}
+                    helperText={touched.ville && errors.ville}
                     sx={{ height: "40px" }}
                   />
                 </Box>
                 <Box>
                   <label htmlFor="phone" style={{ fontWeight: "bold" }}>
-                    Numero Telephone
+                    Numéro de téléphone
                   </label>
                   <TextField
                     size="small"
                     fullWidth
-                    id="outlined-phone"
+                    id="phone"
                     name="phone"
                     variant="outlined"
                     onBlur={handleBlur}
@@ -258,62 +231,19 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="pieceIdentite" style={{ fontWeight: "bold" }}>
-                    N° Piece Identité
-                  </label>
-                  <TextField
-                    size="small"
-                    fullWidth
-                    id="outlined-pieceNumber"
-                    name="pieceNumber"
-                    variant="outlined"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.pieceNumber}
-                    error={!!touched.pieceNumber && !!errors.pieceNumber}
-                    helperText={touched.pieceNumber && errors.pieceNumber}
-                    sx={{ height: "40px" }}
-                  />
-                </Box>
-                <Box>
-                  <label htmlFor="typePice" style={{ fontWeight: "bold" }}>
-                    Type Piece Identité
-                  </label>
-                  <FormControl fullWidth size="small">
-                    <Select
-                      labelId="select-typePice"
-                      id="select-typePice"
-                      name="typePice"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.typePice}
-                      error={!!touched.typePice && !!errors.typePice}
-                      sx={{ height: "40px" }}
-                    >
-                      {["PASSPORT", "CARTE IDENTITE", "CARTE ELECTEUR"].map(
-                        (piece) => (
-                          <MenuItem key={piece} value={piece}>
-                            {piece}
-                          </MenuItem>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
-                </Box>
-                <Box>
-                  <label htmlFor="nationality" style={{ fontWeight: "bold" }}>
-                    Nationnalité
+                  <label htmlFor="pays" style={{ fontWeight: "bold" }}>
+                    Nationalité
                   </label>
                   <Autocomplete
-                    id="country-select-demo"
+                    id="pays"
                     options={countries}
                     getOptionLabel={(option: CountryType) => option.label}
-                    value={values.nationality}
+                    value={values.pays}
                     isOptionEqualToValue={(option, value) =>
                       option.code === value?.code
                     }
                     onChange={(event, value: CountryType | null) => {
-                      setFieldValue("nationality", value);
+                      setFieldValue("pays", value);
                     }}
                     renderOption={(props, option) => {
                       const { key, ...optionProps } = props;
@@ -354,9 +284,9 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
                       />
                     )}
                   />
-                  {touched.nationality && errors.nationality && (
+                  {touched.pays && errors.pays && (
                     <div style={{ color: "red", marginTop: "5px" }}>
-                      {errors.nationality.label}
+                      {errors.pays.label}
                     </div>
                   )}
                 </Box>
@@ -415,7 +345,4 @@ const Client = ({ isOpen, handleModalClose, id }: addCustumer) => {
   );
 };
 
-export default Client;
-function handleClose() {
-  throw new Error("Function not implemented.");
-}
+export default AddModalSyndicat;

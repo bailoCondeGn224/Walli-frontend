@@ -5,24 +5,30 @@ import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import TwoWheelerRoundedIcon from "@mui/icons-material/TwoWheelerRounded";
 import DirectionsBusRoundedIcon from "@mui/icons-material/DirectionsBusRounded";
 import { GridColDef } from "@mui/x-data-grid";
-import { enginsRoulants } from "../../Data/ClientData";
+import { ToastContainer } from "react-toastify";
 import FileBody from "../../Component/Helper/FileBody";
 import ModalAddEngin from "../../Component/Modal/Engins/ModalAddEngin";
 import { useState } from "react";
-import { DeleteModal } from "../../Component/Button/ButtonAdd";
+import { DeleteModalEngin } from "../../Component/Button/ButtonAdd";
 import ModalUpdateEngin from "../../Component/Modal/Engins/ModalUpdateEngin";
 import ScannerIcon from "@mui/icons-material/Scanner";
-
-import { fakeValuesEngin } from "../../Component/Helper/InitialevalueFormik";
 import { useNavigate } from "react-router-dom";
 import ModalShowEngin from "../../Component/Modal/Engins/ModalShowEngin";
 import ModalQrCode from "../../Component/Modal/Engins/ModalQrCode";
 import "./Engins.css";
+import { useQuery } from "@tanstack/react-query";
+import { GetAllEngin } from "../../backEnd/AuthService";
+import Header from "../Header/Header";
 
 const Engin = () => {
   const [isOpenEngin, setIsOpenEngin] = useState<boolean>(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [getValueSearchButton, setGetValueSearchButton] = useState("");
+  const [idUpdate, setIdUpdate] = useState<number>();
+  const [idShow, setIdShow] = useState<number>();
+  const [idDelete, setIdDelete] = useState<number>();
+
+  const [idQr, setIdQr] = useState<number>();
 
   const navigate = useNavigate();
 
@@ -38,32 +44,42 @@ const Engin = () => {
     setIsOpenDeleteModal(false);
   };
 
-  const handleModalOpenDelete = () => {
+  const handleModalOpenDelete = (enginId: any) => {
     setIsOpenDeleteModal(true);
+    setIdDelete(enginId);
   };
 
-  const handleUpdateClick = (id: string) => {
+  const handleUpdateClick = (id: number) => {
     navigate(`?isOpenModalUpdate=true&id=${id}`);
+    setIdUpdate(id);
   };
 
-  const handleShowClick = (id: string) => {
+  const handleShowClick = (id: number) => {
     navigate(`?isOpenModalShow=true&id=${id}`);
+    setIdShow(id);
   };
 
-  const handleQrCodeClick = (id: string) => {
+  const handleQrCodeClick = (id: number) => {
     navigate(`?isOpenModalQrCode=true&id=${id}`);
+    setIdQr(id);
   };
 
   const handleSelectChange = (value: string) => {
     setGetValueSearchButton(value);
   };
 
+  const { data: dataUser } = useQuery({
+    queryKey: ["getEngin"],
+    queryFn: GetAllEngin,
+  });
+  console.log(dataUser);
+
   const columns: GridColDef[] = [
     {
-      field: "id",
-      headerName: "ID Client",
+      field: "enginId",
+      headerName: "ID Engin",
       renderHeader: () => (
-        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>ID Client</b>
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>ID</b>
       ),
       flex: 1,
     },
@@ -77,7 +93,7 @@ const Engin = () => {
       cellClassName: "nom-column--cell",
     },
     {
-      field: "nomProprietaire",
+      field: "proprietaire.user.lastname",
       headerName: "Nom propriétaire",
       renderHeader: () => (
         <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
@@ -86,7 +102,26 @@ const Engin = () => {
       ),
       flex: 1,
       cellClassName: "prenom-column--cell",
+      valueGetter: (Value: any, row: any) => {
+        return `${row.proprietaire.user.lastname || ""} `;
+      },
     },
+
+    {
+      field: "proprietaire.user.firstname",
+      headerName: "prénom propriétaire",
+      renderHeader: () => (
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
+          Prenom propriétaire
+        </b>
+      ),
+      flex: 1,
+      cellClassName: "prenom-column--cell",
+      valueGetter: (Value: any, row: any) => {
+        return `${row.proprietaire.user.firstname || ""} `;
+      },
+    },
+
     {
       field: "marque",
       headerName: "Marque",
@@ -97,7 +132,7 @@ const Engin = () => {
       cellClassName: "prenom-column--cell",
     },
     {
-      field: "modele",
+      field: "model",
       headerName: "Modèle",
       renderHeader: () => (
         <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Modèle</b>
@@ -106,7 +141,7 @@ const Engin = () => {
       cellClassName: "sexe-column--cell",
     },
     {
-      field: "typeActivite",
+      field: "typeActivity",
       headerName: "Type Activité",
       renderHeader: () => (
         <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Type Activité</b>
@@ -114,23 +149,23 @@ const Engin = () => {
       flex: 1,
       renderCell: (params: any) => {
         let icon;
-        if (params.value === "Moto Taxi") {
+        if (params.value === "MOTO_TAXI") {
           icon = (
             <TwoWheelerRoundedIcon
-              style={{ color: " rgb(184, 151, 3)", marginRight: 8 }}
+              style={{ color: "rgb(184, 151, 3)", marginRight: 8 }}
             />
           );
-        } else if (params.value === "Moto Personelle") {
+        } else if (params.value === "MOTO_PERSONNELLE") {
           icon = (
             <TwoWheelerRoundedIcon style={{ color: "gray", marginRight: 8 }} />
           );
-        } else if (params.value === "Voiture Taxi") {
+        } else if (params.value === "VOITURE_TAXI") {
           icon = (
             <DirectionsBusRoundedIcon
-              style={{ color: " rgb(184, 151, 3)", marginRight: 8 }}
+              style={{ color: "rgb(184, 151, 3)", marginRight: 8 }}
             />
           );
-        } else if (params.value === "Voiture Personelle") {
+        } else if (params.value === "VOITURE_PERSONNELLE") {
           icon = (
             <DirectionsBusRoundedIcon
               style={{ color: "gray", marginRight: 8 }}
@@ -168,7 +203,7 @@ const Engin = () => {
               cursor: "pointer",
               padding: "0px 15px",
             }}
-            onClick={() => handleQrCodeClick(_params.row.id)}
+            onClick={() => handleQrCodeClick(_params.row.enginId)}
           >
             <IconButton>
               <ScannerIcon
@@ -185,7 +220,7 @@ const Engin = () => {
               cursor: "pointer",
               padding: "0px 15px",
             }}
-            onClick={() => handleShowClick(_params.row.id)}
+            onClick={() => handleShowClick(_params.row.enginId)}
           >
             <IconButton>
               <IoEyeSharp
@@ -202,7 +237,7 @@ const Engin = () => {
               cursor: "pointer",
               padding: "0px 15px",
             }}
-            onClick={() => handleUpdateClick(_params.row.id)}
+            onClick={() => handleUpdateClick(_params.row.enginId)}
           >
             <IconButton>
               <GrFormEdit
@@ -212,7 +247,7 @@ const Engin = () => {
             </IconButton>
           </Tooltip>
           <Tooltip
-            onClick={handleModalOpenDelete}
+            onClick={() => handleModalOpenDelete(_params.row.enginId)}
             title="Supprimer"
             style={{ color: "red", cursor: "pointer", padding: "0px 15px" }}
           >
@@ -227,22 +262,40 @@ const Engin = () => {
 
   return (
     <Box m="0px">
+      <Box>
+        <Header
+          title="La liste des engins"
+          subtitle="La liste des lines"
+          nombre1=""
+          entete1=""
+          nombre2=""
+          entete2=""
+        />
+      </Box>
       <FileBody
-        clientData={enginsRoulants}
+        clientData={dataUser}
         columns={columns}
         handleModalOpen={handleModalOpen}
         onSelectChange={handleSelectChange}
       />
-      <ModalAddEngin isOpen={isOpenEngin} handleModalClose={handleModalClose} />
-
-      <DeleteModal
-        isOpen={isOpenDeleteModal}
-        handleClose={handleModalCloseDelete}
+      <ToastContainer />
+      <ModalAddEngin
+        isOpen={isOpenEngin}
+        handleModalClose={handleModalClose}
+        id={0}
       />
 
-      <ModalUpdateEngin enginValue={fakeValuesEngin} />
-      <ModalShowEngin />
-      <ModalQrCode />
+      <DeleteModalEngin
+        isOpen={isOpenDeleteModal}
+        handleClose={handleModalCloseDelete}
+        idItem={idDelete}
+      />
+
+      <ModalUpdateEngin id={idUpdate!} />
+
+      <ModalShowEngin id={idShow!} />
+
+      <ModalQrCode id={idQr!} />
     </Box>
   );
 };

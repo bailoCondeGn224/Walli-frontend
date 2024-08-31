@@ -6,6 +6,12 @@ import Taxe from "../page/Taxe/Taxe";
 import Connexion from "../page/Connexion/Connexion";
 import PrivateRoute from "../page/PrivateRole";
 import User from "../page/Utilisateur/User";
+import Syndicat from "../page/Syndicat/Syndicat";
+import Line from "../page/Line/Line";
+import Gare from "../page/Gare/Gare";
+import Trajet from "../page/Destination/Destination";
+import Destination from "../page/Destination/Destination";
+import Passager from "../page/Passager/Passager";
 
 export const router = createBrowserRouter([
   {
@@ -21,12 +27,32 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "clients/moto",
+        path: "clients/proprietaire",
         element: <Clients />,
+      },
+      {
+        path: "clients/syndicat",
+        element: <Syndicat />,
+      },
+      {
+        path: "clients/passager",
+        element: <Passager />,
       },
       {
         path: "engins/engin1",
         element: <Engin />,
+      },
+      {
+        path: "engins/line",
+        element: <Line />,
+      },
+      {
+        path: "engins/destination",
+        element: <Destination />,
+      },
+      {
+        path: "engins/gare",
+        element: <Gare />,
       },
       {
         path: "engins/engin2",

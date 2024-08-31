@@ -1,32 +1,37 @@
 import { Box, IconButton, Tooltip } from "@mui/material";
-import ClientData from "../../Data/ClientData";
+import React, { useState } from "react";
+import FileBody from "../../Component/Helper/FileBody";
+import { ToastContainer } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import { GetAllLine } from "../../backEnd/AuthService";
+import { GridColDef } from "@mui/x-data-grid";
 import { IoEyeSharp } from "react-icons/io5";
 import { GrFormEdit } from "react-icons/gr";
-import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import "./Clients.css";
-import {
-  DeleteModal,
-  DeleteModalPropriataire,
-} from "../../Component/Button/ButtonAdd";
-import Client from "../../Component/Modal/Clients/Client";
-import { useState } from "react";
-import ShowModal from "../../Component/Modal/Clients/ShowModal";
-import UpdateModal from "../../Component/Modal/Clients/UpdateModal";
-import FileBody from "../../Component/Helper/FileBody";
-import { useQuery } from "@tanstack/react-query";
-import { GetAllProprietaire } from "../../backEnd/AuthService";
-import { GridColDef } from "@mui/x-data-grid";
-import { ToastContainer } from "react-toastify";
+import AddModalLine from "../../Component/Modal/Line/AddModalLine";
 import Header from "../Header/Header";
+import { useNavigate } from "react-router-dom";
+import ShowModalLine from "../../Component/Modal/Line/ShowModalLine";
+import ModalUpdateLine from "../../Component/Modal/Line/ModalUpdateLine";
+import { DeleteModalLine } from "../../Component/Button/ButtonAdd";
 
-const Clients = () => {
+const Line = () => {
+  const { data: dataUser } = useQuery({
+    queryKey: ["getLine"],
+    queryFn: GetAllLine,
+  });
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenShowModal, setIsOpenShowModal] = useState<boolean>(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [isOpenUpdateModal, setIsOpenUpdateModal] = useState<boolean>(false);
   const [idClient, setIdClient] = useState<number>();
-  const [idClientUpdate, setIdClientUpdate] = useState<number>();
+  const [idUpdate, setIdUpdate] = useState<number>();
+  const [idUpdateSyndicat, setidUpdateSyndicat] = useState<number>();
   const [idDelete, setIdDelete] = useState<number>();
+  const [idShow, setIdShow] = useState<number>();
+
+  const navigate = useNavigate();
 
   const handleModalClose = () => {
     setIsOpen(false);
@@ -35,18 +40,15 @@ const Clients = () => {
     setIsOpen(true);
   };
 
-  const handleModalOpenShow = (id: number) => {
-    setIsOpenShowModal(true);
-    setIdClient(id);
+  const handleShowClick = (id: number) => {
+    navigate(`?isOpenModalShowLine=true&id=${id}`);
+    setIdShow(id);
+    console.log(id);
   };
 
-  const handleModalCloseUpdate = () => {
-    setIsOpenUpdateModal(false);
-  };
-
-  const handleModalOpenUpdate = (id: number) => {
-    setIsOpenUpdateModal(true);
-    setIdClientUpdate(id);
+  const handleUpdateClick = (id: number) => {
+    navigate(`?isOpenModalUpdateLine=true&id=${id}`);
+    setIdUpdate(id);
   };
 
   const handleModalCloseDelete = () => {
@@ -58,20 +60,10 @@ const Clients = () => {
     setIdDelete(id);
   };
 
-  const handleModalCloseShowModal = () => {
-    setIsOpenShowModal(false);
-  };
-
-  const { data: dataUser } = useQuery({
-    queryKey: ["proprietaireid"],
-    queryFn: GetAllProprietaire,
-  });
-  console.log(dataUser);
-  // pour les colonnes du tableau
   const columns: GridColDef[] = [
     {
       field: "id",
-      headerName: "ID client",
+      headerName: "ID Line",
       renderHeader: () => (
         <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>ID</b>
       ),
@@ -79,75 +71,107 @@ const Clients = () => {
     },
     {
       field: "nom",
-      headerName: "Nom client",
+      headerName: "Nom Syndicat",
       renderHeader: () => (
-        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Nom </b>
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Nom Syndicat</b>
       ),
       flex: 1,
-      cellClassName: "nom-column--cell",
+
       valueGetter: (Value: any, row: any) => {
-        return `${row.user.lastname || ""} `;
+        return `${row.syndicat?.user?.lastname || ""} `;
       },
     },
+
     {
       field: "prenom",
-      headerName: "prenom client",
+      headerName: "prenom Syndicat",
       renderHeader: () => (
-        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Prenom </b>
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Nom Syndicat</b>
       ),
       flex: 1,
-      cellClassName: "prenom-column--cell",
+
       valueGetter: (Value: any, row: any) => {
-        return `${row.user.firstname || ""} `;
+        return `${row.syndicat?.user?.firstname || ""} `;
       },
     },
     {
       field: "email",
-      headerName: "email",
+      headerName: "Email",
       renderHeader: () => (
-        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Email </b>
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Email</b>
       ),
       flex: 1,
-      cellClassName: "prenom-column--cell",
       valueGetter: (Value: any, row: any) => {
-        return `${row.user.email || ""} `;
+        return `${row.syndicat?.user?.email || ""} `;
       },
     },
     {
       field: "sexe",
-      headerName: "sexe",
+      headerName: "Sexe",
       renderHeader: () => (
-        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Sexe </b>
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Sexe</b>
       ),
       flex: 1,
-      cellClassName: "sexe-column--cell",
       valueGetter: (Value: any, row: any) => {
-        return `${row.user.sexe || ""} `;
+        return `${row.syndicat?.user?.sexe || ""} `;
       },
     },
     {
       field: "phone",
-      headerName: "telephone",
+      headerName: "Téléphone",
       renderHeader: () => (
-        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Telephone </b>
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Téléphone</b>
       ),
       flex: 1,
+      valueGetter: (Value: any, row: any) => {
+        return `${row.syndicat?.phone || ""} `;
+      },
     },
     {
-      field: "city",
-      headerName: "ville",
+      field: "quartier",
+      headerName: "Quartier",
       renderHeader: () => (
-        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Ville </b>
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Quartier</b>
       ),
       flex: 1,
+      valueGetter: (Value: any, row: any) => {
+        return `${row.syndicat?.quartier || ""} `;
+      },
     },
     {
-      field: "nationality",
-      headerName: "Nationalité",
+      field: "ville",
+      headerName: "Ville/Commune",
       renderHeader: () => (
-        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Nationalité </b>
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Ville/Commune</b>
       ),
       flex: 1,
+      valueGetter: (Value: any, row: any) => {
+        return `${row.syndicat?.ville || ""} `;
+      },
+    },
+    {
+      field: "nomline",
+      headerName: "Line",
+      renderHeader: () => (
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Line</b>
+      ),
+      flex: 1,
+      valueGetter: (Value: any, row: any) => {
+        return `${row?.nomline} `;
+      },
+    },
+    {
+      field: "engins",
+      headerName: "Nombre Engin(s)",
+      renderHeader: () => (
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>
+          Nombre Engin(s)
+        </b>
+      ),
+      flex: 1,
+      valueGetter: (Value: any, row: any) => {
+        return `${row.engins?.length || ""} `;
+      },
     },
     {
       field: "options",
@@ -172,7 +196,7 @@ const Clients = () => {
               padding: "0px 15px",
             }}
           >
-            <IconButton onClick={() => handleModalOpenShow(params.row.id)}>
+            <IconButton onClick={() => handleShowClick(params.row.id)}>
               <IoEyeSharp
                 size={20}
                 style={{ color: "rgba(0, 0, 160, 0.70)" }}
@@ -188,7 +212,7 @@ const Clients = () => {
               padding: "0px 15px",
             }}
           >
-            <IconButton onClick={() => handleModalOpenUpdate(params.row.id)}>
+            <IconButton onClick={() => handleUpdateClick(params.row.id)}>
               <GrFormEdit
                 size={20}
                 style={{ color: "rgba(0, 0, 160, 0.70)" }}
@@ -208,11 +232,15 @@ const Clients = () => {
     },
   ];
 
+  function handleSelectChange(value: string): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
-    <Box m="0px">
+    <Box>
       <Box>
         <Header
-          title="La liste des clients"
+          title="La liste des lines"
           subtitle="La liste des lines"
           nombre1=""
           entete1=""
@@ -221,35 +249,26 @@ const Clients = () => {
         />
       </Box>
       <FileBody
-        clientData={dataUser || []}
+        clientData={dataUser}
         columns={columns}
         handleModalOpen={handleModalOpen}
-        onSelectChange={function (value: string): void {
-          throw new Error("Function not implemented.");
-        }}
+        onSelectChange={handleSelectChange}
       />
       <ToastContainer />
-      <Client isOpen={isOpen} handleModalClose={handleModalClose} id={0} />
-
-      <DeleteModalPropriataire
+      <AddModalLine
+        isOpen={isOpen}
+        handleModalClose={handleModalClose}
+        id={0}
+      />
+      <DeleteModalLine
         isOpen={isOpenDeleteModal}
         handleClose={handleModalCloseDelete}
         idItem={idDelete}
       />
-      <ShowModal
-        id={idClient!}
-        isOpen={isOpenShowModal}
-        role={"Admin"}
-        handleModalClose={handleModalCloseShowModal}
-      />
-      <UpdateModal
-        id={idClientUpdate!}
-        isOpen={isOpenUpdateModal}
-        handleModalClose={handleModalCloseUpdate}
-        idSyndicat={0}
-      />
+      <ModalUpdateLine id={idUpdate!} />
+      <ShowModalLine id={idShow!} />
     </Box>
   );
 };
 
-export default Clients;
+export default Line;

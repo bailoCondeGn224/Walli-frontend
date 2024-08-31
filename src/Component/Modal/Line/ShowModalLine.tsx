@@ -1,3 +1,4 @@
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Box,
   Button,
@@ -7,33 +8,31 @@ import {
   Tab,
   Typography,
 } from "@mui/material";
-
-import { useNavigate, useSearchParams } from "react-router-dom";
-import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useQuery } from "@tanstack/react-query";
-import { GetByIdEngin } from "../../../backEnd/AuthService";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { GetByIdLine } from "../../../backEnd/AuthService";
+import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import React from "react";
 
-const ModalShowEngin = ({ id }: { id: number }) => {
+const ShowModalLine = ({ id }: { id: number }) => {
   const [searchParams] = useSearchParams();
   const [value, setValue] = React.useState("1");
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
-
   const navigate = useNavigate();
   const {
     data: dataUser,
     error,
     isLoading,
+    refetch,
   } = useQuery({
-    queryKey: ["getProprietaireByIdClient", id],
-    queryFn: () => GetByIdEngin(id),
+    queryKey: ["getProprietaireByIdLine", { id }],
+    queryFn: () => GetByIdLine(id),
     enabled: !!id,
   });
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {(error as Error).message}</div>;
+
+  console.log("voici les line:", id);
   return (
     <Dialog
       sx={{
@@ -44,7 +43,7 @@ const ModalShowEngin = ({ id }: { id: number }) => {
         },
       }}
       maxWidth="lg"
-      open={searchParams.get("isOpenModalShow") === "true"}
+      open={searchParams.get("isOpenModalShowLine") === "true"}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
@@ -65,7 +64,7 @@ const ModalShowEngin = ({ id }: { id: number }) => {
         </DialogTitle>
         <Button
           sx={{ fontSize: "1.3rem", fontWeight: "bold", mr: 1.5 }}
-          onClick={() => navigate("/engins/engin1")}
+          onClick={() => navigate("/engins/line")}
         >
           <CancelPresentationIcon
             sx={{
@@ -92,168 +91,92 @@ const ModalShowEngin = ({ id }: { id: number }) => {
               <Grid container spacing={2}>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Nom
+                    Nom line
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.proprietaire?.user?.lastname}
+                    {dataUser?.nomline}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Prénom
+                    Ville de la line
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.proprietaire?.user?.firstname}
+                    {dataUser?.ville}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Sexe
+                    Quartier de la line
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.proprietaire?.user?.sexe}
+                    {dataUser?.quartier}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Numéro Téléphone
+                    Numéro Téléphone du syndicat
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.proprietaire?.phone}
+                    {dataUser?.syndicat?.phone}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Adresse Mail
+                    Adresse Mail du syndicat
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.proprietaire?.user?.email}
+                    {dataUser?.syndicat?.user?.email}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Date de Naissance
+                    Prenom Syndicat
+                  </Typography>
+                  <span style={{ fontSize: "14px", color: "gray" }}>
+                    {dataUser?.syndicat?.user?.firstname}
+                  </span>
+                </Grid>
+                <Grid item xs={3}>
+                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
+                    Nom Syndicat
+                  </Typography>
+                  <span style={{ fontSize: "14px", color: "gray" }}>
+                    {dataUser?.syndicat?.user?.lastname}
+                  </span>
+                </Grid>
+                <Grid item xs={3}>
+                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
+                    Date de Naissance du syndicat
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
                     {new Date(
-                      dataUser?.proprietaire?.dateOfBirth
+                      dataUser?.syndicat?.dateOfBirth
                     ).toLocaleDateString()}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Immatriculation
+                    Pays du syndicat
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.immatricule}
+                    {dataUser?.syndicat?.nationality}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Marque
+                    Ville du syndicat
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.marque}
+                    {dataUser?.syndicat?.ville}
                   </span>
                 </Grid>
                 <Grid item xs={3}>
                   <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Modèle
+                    Quartier du syndicat
                   </Typography>
                   <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.model}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Type d'activité
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.typeActivity}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Date de mise en service
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {new Date(dataUser?.dateService).toLocaleDateString()}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Numéro carte verte
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.numeroCarteVerte}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Assurance existe
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.existAssurance ? "Oui" : "Non"}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Date expiration assurance
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {new Date(
-                      dataUser?.dateEpireAssurance
-                    ).toLocaleDateString()}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Carte grise existe
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.existCarteGris ? "Oui" : "Non"}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Date expiration carte grise
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {new Date(
-                      dataUser?.dateEpireCarteGris
-                    ).toLocaleDateString()}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Vignette existe
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.existVignette ? "Oui" : "Non"}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Date expiration vignette
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {new Date(dataUser?.dateEpireVignette).toLocaleDateString()}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Ville de Naissance
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.proprietaire?.city}
-                  </span>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                    Nationalité
-                  </Typography>
-                  <span style={{ fontSize: "14px", color: "gray" }}>
-                    {dataUser?.proprietaire?.nationality}
+                    {dataUser?.syndicat?.quartier}
                   </span>
                 </Grid>
               </Grid>
@@ -269,4 +192,4 @@ const ModalShowEngin = ({ id }: { id: number }) => {
   );
 };
 
-export default ModalShowEngin;
+export default ShowModalLine;

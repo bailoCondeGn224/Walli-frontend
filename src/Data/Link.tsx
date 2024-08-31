@@ -29,13 +29,22 @@ const links: Link[] = [
     id: 2,
     text: "Clients",
     icon: <AccountCircleIcon sx={{ color: "white" }} />,
-    children: [{ id: 21, text: "Proprietaire", link: "/clients/moto" }],
+    children: [
+      { id: 21, text: "Proprietaire", link: "/clients/proprietaire" },
+      { id: 22, text: "Syndicat", link: "/clients/syndicat" },
+      { id: 23, text: "Passager", link: "/clients/passager" },
+    ],
   },
   {
     id: 3,
     text: "Engins",
     icon: <BuildIcon sx={{ color: "white" }} />,
-    children: [{ id: 31, text: "Engin 1", link: "/engins/engin1" }],
+    children: [
+      { id: 31, text: "Engin", link: "/engins/engin1" },
+      { id: 32, text: "Line", link: "/engins/line" },
+      { id: 33, text: "Gare", link: "/engins/gare" },
+      { id: 34, text: "Destination", link: "/engins/destination" },
+    ],
   },
   {
     id: 4,

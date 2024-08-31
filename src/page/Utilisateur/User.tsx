@@ -15,6 +15,7 @@ import { GetAllUsers } from "../../backEnd/AuthService";
 import { MdOutlineAutofpsSelect } from "react-icons/md";
 import { ToastContainer } from "react-toastify";
 import Client from "../../Component/Modal/Clients/Client";
+import Header from "../Header/Header";
 
 const User = () => {
   const [isOpenUser, setIsOpenUser] = useState<boolean>(false);
@@ -227,6 +228,16 @@ const User = () => {
   ];
   return (
     <Box m="0px">
+      <Box>
+        <Header
+          title="La liste des utilisateurs"
+          subtitle="La liste des lines"
+          nombre1=""
+          entete1=""
+          nombre2=""
+          entete2=""
+        />
+      </Box>
       <FileBody
         clientData={dataUser || []}
         columns={columns}

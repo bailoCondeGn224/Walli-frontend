@@ -16,6 +16,14 @@ export interface showClient {
   numeroTelephone: string;
   nationality: any;
 }
+export interface GareinitialeValue {
+  nom: string;
+  city: string;
+  longitude: string;
+  altitude: string;
+  latitude: string;
+  syndicatId: number;
+}
 
 export interface connexionInterface {
   email: string;
@@ -64,12 +72,13 @@ export interface qrCode {
 }
 
 export interface User {
+  id: any;
   firstname: string;
   lastname: string;
   username: string;
   sexe: string;
   email: string;
-  role: string;
+  role: [];
 }
 
 export interface UserUpdate {
@@ -106,8 +115,45 @@ export interface InitialValuesType {
   nationality: CountryType;
 }
 
+export interface InitialValuesTypeUdateSyndicat {
+  userId: number;
+  dateOfBirth: string;
+  ville: string;
+  phone: string;
+  quartier: string;
+  pays: CountryType;
+}
+
 export interface updateClient {
-  idClient: number;
+  id: number;
   isOpen: boolean;
   handleModalClose: () => void;
+  idSyndicat: number;
+}
+
+export interface InitialValuesEnginUpdate {
+  immatricule: string;
+  proprietaireId: number;
+  lineId?: number | null;
+  marque: string;
+  model: string;
+  typeActivity: string;
+  dateService: string;
+  numeroCarteVerte: string;
+  existAssurance: string;
+  dateEpireAssurance?: string;
+  existCarteGris: string;
+  dateEpireCarteGris?: string;
+  existVignette: string;
+  dateEpireVignette?: string;
+}
+
+export interface InitialValuesPassagerAdd {
+  nom: string;
+  prenom: string;
+  villeDepart: string;
+  villeDestination: string;
+  phone: string;
+  status: String;
+  gareId: number;
 }

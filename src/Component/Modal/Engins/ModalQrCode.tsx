@@ -1,5 +1,6 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import Logo from "../../../assets/logo.png";
 import {
   Box,
   Dialog,
@@ -7,17 +8,18 @@ import {
   SpeedDialAction,
   SpeedDialIcon,
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
 import PrintIcon from "@mui/icons-material/Print";
 import { useReactToPrint } from "react-to-print";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { GetByIdEngin } from "../../../backEnd/AuthService";
 
-const ModalQrCode: React.FC = () => {
+const ModalQrCode = ({ id }: { id: number }) => {
   const contentToPrint = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
   // Fonction pour imprimer
   const handlePrint = useReactToPrint({
     content: () => contentToPrint.current!,
@@ -26,7 +28,19 @@ const ModalQrCode: React.FC = () => {
     onAfterPrint: () => console.log("after printing..."),
     removeAfterPrint: true,
   });
+  const {
+    data: dataUser,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["getProprietaireByIdClient", id],
+    queryFn: () => GetByIdEngin(id),
+    enabled: !!id,
+  });
 
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {(error as Error).message}</div>;
+  console.log("immatricule:", dataUser?.immatricule || "");
   // Fonction pour fermer le modal
   const closeQrcode = () => {
     navigate("/engins/engin1");
@@ -44,16 +58,16 @@ const ModalQrCode: React.FC = () => {
         <h4 style={{ color: "black" }}>Walli Group Transport</h4>
       </div>
       <QRCodeSVG
-        value={"15420"}
+        value={dataUser?.immatricule || ""}
         size={220}
         bgColor={"#ffffff"}
         fgColor={"#000000"}
         level={"L"}
         includeMargin={true}
         imageSettings={{
-          src: "https://static.zpao.com/favicon.png",
-          height: 24,
-          width: 24,
+          src: Logo,
+          height: 30,
+          width: 30,
           excavate: true,
         }}
       />

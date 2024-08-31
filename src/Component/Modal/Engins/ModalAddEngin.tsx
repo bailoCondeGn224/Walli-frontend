@@ -7,13 +7,13 @@ import {
   DialogTitle,
   FormControl,
   FormControlLabel,
-  FormLabel,
   MenuItem,
   Radio,
   RadioGroup,
   Select,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Form, Formik } from "formik";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
@@ -24,14 +24,69 @@ import {
 } from "../../Helper/InitialevalueFormik";
 import { addCustumer } from "../../Interface/InterfaceClient";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AddEngin } from "../../../backEnd/AuthService";
 
 const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
   const [isSelectedAssurance, setIsSelectedAssurance] = useState(false);
   const [isSelectedCarteGris, setIsSelectedCarteGris] = useState(false);
   const [isSelectedVignette, setIsSelectedVignette] = useState(false);
 
+  const notify = () => toast.success("Insertion  effectuée avec succès!");
+  const notifyErreur = () =>
+    toast.error("Insertion a echouée", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: AddEngin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getEngin"],
+        exact: true,
+        refetchType: "active",
+      });
+      handleModalClose();
+      notify();
+    },
+    onError: (error) => {
+      console.log(error);
+      notifyErreur();
+      handleModalClose();
+    },
+  });
+
   const handleSubmits = (values: any) => {
-    console.log(values);
+    const validTypeActivities = [
+      "MOTO_TAXI",
+      "VOITURE_TAXI",
+      "MOTO_PERSONNELLE",
+      "VOITURE_PERSONNELLE",
+    ];
+    const typeActivity = validTypeActivities.includes(values.typeActivity)
+      ? values.typeActivity
+      : "MOTO_TAXI";
+    const submissionValues = {
+      ...values,
+      typeActivity: typeActivity,
+      proprietaireId: parseInt(values.proprietaireId, 10),
+      lineId: parseInt(values.lineId, 10),
+      existAssurance: values.existAssurance === "Oui" ? true : false,
+      existCarteGris: values.existCarteGris === "Oui" ? true : false,
+      existVignette: values.existVignette === "Oui" ? true : false,
+    };
+    console.log(submissionValues);
+    mutation.mutate(submissionValues);
   };
   return (
     <Dialog
@@ -59,7 +114,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
           variant="h6"
           sx={{ fontWeight: "bold" }}
         >
-          Enregistrement d'un client
+          Enregistrement d'un engin
         </DialogTitle>
         <Button
           sx={{ fontSize: "1.3rem", fontWeight: "bold", mr: 1.5 }}
@@ -92,7 +147,7 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                 }}
               >
                 <Box>
-                  <label htmlFor="nom">Immatricule</label>
+                  <label htmlFor="immatricule">Immatricule</label>
                   <TextField
                     fullWidth
                     type="text"
@@ -104,31 +159,43 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                     onChange={handleChange}
                     value={values.immatricule}
                     error={!!touched.immatricule && !!errors.immatricule}
-                    helperText={touched.immatricule && !!errors.immatricule}
+                    helperText={touched.immatricule && errors.immatricule}
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="prenom">Nom propriétaire</label>
+                  <label htmlFor="proprietaireId">ID propriétaire</label>
                   <TextField
                     fullWidth
                     type="text"
                     size="small"
-                    name="nomProprietaire"
-                    id="outlined-nomProprietaire"
+                    name="proprietaireId"
+                    id="outlined-proprietaireId"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.nomProprietaire}
-                    error={
-                      !!touched.nomProprietaire && !!errors.nomProprietaire
-                    }
-                    helperText={
-                      touched.nomProprietaire && !!errors.nomProprietaire
-                    }
+                    value={values.proprietaireId}
+                    error={!!touched.proprietaireId && !!errors.proprietaireId}
+                    helperText={touched.proprietaireId && errors.proprietaireId}
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="email">Marque</label>
+                  <label htmlFor="lineId">ID line</label>
+                  <TextField
+                    fullWidth
+                    type="text"
+                    size="small"
+                    name="lineId"
+                    id="outlined-lineId"
+                    variant="outlined"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.lineId}
+                    error={!!touched.lineId && !!errors.lineId}
+                    helperText={touched.lineId && errors.lineId}
+                  />
+                </Box>
+                <Box>
+                  <label htmlFor="marque">Marque</label>
                   <TextField
                     fullWidth
                     type="text"
@@ -140,37 +207,37 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                     onChange={handleChange}
                     value={values.marque}
                     error={!!touched.marque && !!errors.marque}
-                    helperText={touched.marque && !!errors.marque}
+                    helperText={touched.marque && errors.marque}
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="email">Modèle</label>
+                  <label htmlFor="model">Modèle</label>
                   <TextField
                     fullWidth
                     type="text"
                     size="small"
-                    name="modele"
-                    id="outlined-modele"
+                    name="model"
+                    id="outlined-model"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.modele}
-                    error={!!touched.modele && !!errors.modele}
-                    helperText={touched.modele && !!errors.modele}
+                    value={values.model}
+                    error={!!touched.model && !!errors.model}
+                    helperText={touched.model && errors.model}
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="role">Type d'activité</label>
+                  <label htmlFor="typeActivity">Type d'activité</label>
                   <Select
                     fullWidth
                     size="small"
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    name="typeActivite"
+                    name="typeActivity"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.typeActivite}
-                    error={!!touched.typeActivite && !!errors.typeActivite}
+                    value={values.typeActivity}
+                    error={!!touched.typeActivity && !!errors.typeActivity}
                   >
                     {[
                       "TAXI_MOTO",
@@ -186,27 +253,23 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                   </Select>
                 </Box>
                 <Box>
-                  <label htmlFor="">Date mise en service</label>
+                  <label htmlFor="dateService">Date mise en service</label>
                   <TextField
                     fullWidth
                     size="small"
                     type="date"
-                    name="dateMiseEnSevice"
-                    id="outlined-dateMiseEnSevice"
+                    name="dateService"
+                    id="outlined-dateService"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.dateMiseEnSevice}
-                    error={
-                      !!touched.dateMiseEnSevice && !!errors.dateMiseEnSevice
-                    }
-                    helperText={
-                      touched.dateMiseEnSevice && !!errors.dateMiseEnSevice
-                    }
+                    value={values.dateService}
+                    error={!!touched.dateService && !!errors.dateService}
+                    helperText={touched.dateService && errors.dateService}
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="ville">Numéro carte verte</label>
+                  <label htmlFor="numeroCarteVerte">Numéro carte verte</label>
                   <TextField
                     fullWidth
                     size="small"
@@ -220,231 +283,192 @@ const ModalAddEngin = ({ isOpen, handleModalClose }: addCustumer) => {
                       !!touched.numeroCarteVerte && !!errors.numeroCarteVerte
                     }
                     helperText={
-                      touched.numeroCarteVerte && !!errors.numeroCarteVerte
+                      touched.numeroCarteVerte && errors.numeroCarteVerte
                     }
                   />
                 </Box>
               </Box>
 
-              <Stack direction="row" gap={2} pt="14px">
+              <Stack direction="row" gap={2} p="8px">
                 <Box
                   sx={{
-                    width: "230px",
-                    height: "150px",
                     border: "1px solid rgba(0, 0, 160, 0.70)",
-                    borderRadius: "6px",
+                    borderRadius: "2px",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
                     alignContent: "center",
+                    paddingBottom: "5px",
                   }}
                 >
                   <Stack
                     alignContent="center"
                     alignItems="center"
-                    direction="column"
+                    textAlign="center"
                   >
-                    <div>
-                      <FormControl>
-                        <FormLabel id="demo-row-radio-buttons-group-label">
-                          Avez-vous une assurance ?
-                        </FormLabel>
-                        <RadioGroup
-                          row
-                          aria-labelledby="demo-row-radio-buttons-group-label"
-                          defaultValue="Non"
-                          name="existeAssurance"
-                          value={values.existeAssurance}
-                          onChange={(e) => {
-                            handleChange(e);
-                            setIsSelectedAssurance(e.target.value === "Oui");
-                          }}
-                        >
-                          <FormControlLabel
-                            value="Oui"
-                            control={<Radio />}
-                            label="Oui"
-                          />
-                          <FormControlLabel
-                            value="Non"
-                            control={<Radio />}
-                            label="Non"
-                          />
-                        </RadioGroup>
-                      </FormControl>
-                    </div>
-                    <div>
-                      <Box pl="15px">
-                        <label htmlFor="">Date expiration</label>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          type="date"
-                          name="assuranceExpire"
-                          id="outlined-assuranceExpire"
-                          variant="outlined"
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          value={values.assuranceExpire}
-                          error={
-                            !!touched.assuranceExpire &&
-                            !!errors.assuranceExpire
-                          }
-                          helperText={
-                            touched.assuranceExpire && !!errors.assuranceExpire
-                          }
-                          disabled={!isSelectedAssurance}
-                          sx={{ width: "200px" }}
+                    <Typography> Aves vous une assurance?</Typography>
+                    <FormControl>
+                      <RadioGroup
+                        name="existAssurance"
+                        onChange={handleChange}
+                        value={values.existAssurance}
+                      >
+                        <FormControlLabel
+                          value="Oui"
+                          control={<Radio />}
+                          label="Oui"
                         />
-                      </Box>
-                    </div>
+                        <FormControlLabel
+                          value="Non"
+                          control={<Radio />}
+                          label="Non"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    <Box>
+                      <label htmlFor="">Date expiration</label>
+                      <TextField
+                        sx={{ padding: "10px" }}
+                        fullWidth
+                        size="small"
+                        id="outlined-dateEpireAssurance"
+                        name="dateEpireAssurance"
+                        type="date"
+                        variant="outlined"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.dateEpireAssurance}
+                        error={
+                          !!touched.dateEpireAssurance &&
+                          !!errors.dateEpireAssurance
+                        }
+                        helperText={
+                          touched.dateEpireAssurance &&
+                          errors.dateEpireAssurance
+                        }
+                      />
+                    </Box>
                   </Stack>
                 </Box>
 
                 <Box
                   sx={{
-                    width: "230px",
-                    height: "150px",
                     border: "1px solid rgba(0, 0, 160, 0.70)",
-                    borderRadius: "6px",
+                    borderRadius: "2px",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
                     alignContent: "center",
+                    paddingBottom: "5px",
                   }}
                 >
                   <Stack
                     alignContent="center"
                     alignItems="center"
-                    direction="column"
+                    textAlign="center"
                   >
-                    <div>
-                      <FormControl>
-                        <FormLabel id="demo-row-radio-buttons-group-label">
-                          Avez-vous une vignette ?
-                        </FormLabel>
-                        <RadioGroup
-                          row
-                          aria-labelledby="demo-row-radio-buttons-group-label"
-                          name="existevignette"
-                          defaultValue="Non"
-                          value={values.existevignette}
-                          onChange={(e) => {
-                            handleChange(e);
-                            setIsSelectedVignette(e.target.value === "Oui");
-                          }}
-                        >
-                          <FormControlLabel
-                            value="Oui"
-                            control={<Radio />}
-                            label="Oui"
-                          />
-                          <FormControlLabel
-                            value="Non"
-                            control={<Radio />}
-                            label="Non"
-                          />
-                        </RadioGroup>
-                      </FormControl>
-                    </div>
-                    <div>
-                      <Box pl="15px">
-                        <label htmlFor="">Date expiration</label>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          type="date"
-                          name="vignetteExpire"
-                          id="outlined-vignetteExpire"
-                          variant="outlined"
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          value={values.vignetteExpire}
-                          error={
-                            !!touched.vignetteExpire && !!errors.vignetteExpire
-                          }
-                          helperText={
-                            touched.vignetteExpire && !!errors.vignetteExpire
-                          }
-                          disabled={!isSelectedVignette}
-                          sx={{ width: "200px" }}
+                    <Typography>Avez-vous une carte grise?</Typography>
+                    <FormControl>
+                      <RadioGroup
+                        name="existCarteGris"
+                        onChange={handleChange}
+                        value={values.existCarteGris}
+                      >
+                        <FormControlLabel
+                          value="Oui"
+                          control={<Radio />}
+                          label="Oui"
                         />
-                      </Box>
-                    </div>
+                        <FormControlLabel
+                          value="Non"
+                          control={<Radio />}
+                          label="Non"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    <Box>
+                      <label htmlFor="">Date expiration</label>
+                      <TextField
+                        sx={{ padding: "10px" }}
+                        fullWidth
+                        size="small"
+                        id="outlined-dateEpireCarteGris"
+                        name="dateEpireCarteGris"
+                        type="date"
+                        variant="outlined"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.dateEpireCarteGris}
+                        error={
+                          !!touched.dateEpireCarteGris &&
+                          !!errors.dateEpireCarteGris
+                        }
+                        helperText={
+                          touched.dateEpireCarteGris &&
+                          errors.dateEpireCarteGris
+                        }
+                      />
+                    </Box>
                   </Stack>
                 </Box>
 
                 <Box
                   sx={{
-                    width: "230px",
-                    height: "150px",
                     border: "1px solid rgba(0, 0, 160, 0.70)",
-                    borderRadius: "6px",
+                    borderRadius: "2px",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
                     alignContent: "center",
+                    paddingBottom: "5px",
                   }}
                 >
                   <Stack
                     alignContent="center"
                     alignItems="center"
-                    direction="column"
+                    textAlign="center"
                   >
-                    <div>
-                      <FormControl>
-                        <FormLabel id="demo-row-radio-buttons-group-label">
-                          Avez-vous une carte gris ?
-                        </FormLabel>
-                        <RadioGroup
-                          row
-                          aria-labelledby="demo-row-radio-buttons-group-label"
-                          name="existeCarteGris"
-                          defaultValue="Non"
-                          value={values.existeCarteGris}
-                          onChange={(e) => {
-                            handleChange(e);
-                            setIsSelectedCarteGris(e.target.value === "Oui");
-                          }}
-                        >
-                          <FormControlLabel
-                            value="Oui"
-                            control={<Radio />}
-                            label="Oui"
-                          />
-                          <FormControlLabel
-                            value="Non"
-                            control={<Radio />}
-                            label="Non"
-                          />
-                        </RadioGroup>
-                      </FormControl>
-                    </div>
-                    <div>
-                      <Box pl="15px">
-                        <label htmlFor="">Date expiration</label>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          type="date"
-                          name="carteGrisExpire"
-                          id="outlined-carteGrisExpire"
-                          variant="outlined"
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          value={values.carteGrisExpire}
-                          error={
-                            !!touched.carteGrisExpire &&
-                            !!errors.carteGrisExpire
-                          }
-                          helperText={
-                            touched.carteGrisExpire && !!errors.carteGrisExpire
-                          }
-                          sx={{ width: "200px" }}
-                          disabled={!isSelectedCarteGris}
+                    <Typography>Aves vous une vignette?</Typography>
+                    <FormControl>
+                      <RadioGroup
+                        name="existVignette"
+                        onChange={handleChange}
+                        value={values.existVignette}
+                      >
+                        <FormControlLabel
+                          value="Oui"
+                          control={<Radio />}
+                          label="Oui"
                         />
-                      </Box>
-                    </div>
+                        <FormControlLabel
+                          value="Non"
+                          control={<Radio />}
+                          label="Non"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    <Box>
+                      <label htmlFor="">Date expiration</label>
+                      <TextField
+                        sx={{ padding: "10px" }}
+                        fullWidth
+                        size="small"
+                        id="outlined-dateEpireVignette"
+                        name="dateEpireVignette"
+                        type="date"
+                        variant="outlined"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.dateEpireVignette}
+                        error={
+                          !!touched.dateEpireVignette &&
+                          !!errors.dateEpireVignette
+                        }
+                        helperText={
+                          touched.dateEpireVignette && errors.dateEpireVignette
+                        }
+                      />
+                    </Box>
                   </Stack>
                 </Box>
               </Stack>

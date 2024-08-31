@@ -55,6 +55,7 @@ const FileBody: React.FC<FileBodyProps> = (props) => {
       <DataGrid
         rows={props.clientData}
         columns={props.columns}
+        getRowId={(row) => row.id}
         pagination={true}
         checkboxSelection
         initialState={{

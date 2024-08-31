@@ -32,7 +32,7 @@ const Connexion = () => {
       const response = await login(values);
       console.log("Received response:", response);
       localStorage.setItem("user", JSON.stringify(response));
-      navigate("/clients/moto");
+      navigate("/clients/proprietaire");
     } catch (error) {
       console.error("Login error:", error);
       setIsError("Erreur de connexion");

@@ -1,31 +1,26 @@
 import { Box, IconButton, Tooltip } from "@mui/material";
-import ClientData from "../../Data/ClientData";
+import { useState } from "react";
+import FileBody from "../../Component/Helper/FileBody";
+import { ToastContainer } from "react-toastify";
+import { GridColDef } from "@mui/x-data-grid";
 import { IoEyeSharp } from "react-icons/io5";
 import { GrFormEdit } from "react-icons/gr";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import "./Clients.css";
-import {
-  DeleteModal,
-  DeleteModalPropriataire,
-} from "../../Component/Button/ButtonAdd";
-import Client from "../../Component/Modal/Clients/Client";
-import { useState } from "react";
-import ShowModal from "../../Component/Modal/Clients/ShowModal";
-import UpdateModal from "../../Component/Modal/Clients/UpdateModal";
-import FileBody from "../../Component/Helper/FileBody";
 import { useQuery } from "@tanstack/react-query";
-import { GetAllProprietaire } from "../../backEnd/AuthService";
-import { GridColDef } from "@mui/x-data-grid";
-import { ToastContainer } from "react-toastify";
+import { GetAllSyndicat } from "../../backEnd/AuthService";
+import AddModalSyndicat from "../../Component/Modal/Syndicat/AddModalSyndicat";
+import ShowModalSyndicat from "../../Component/Modal/Syndicat/ShowModalSyndicat";
+import UpdateModalSyndicat from "../../Component/Modal/Syndicat/UpdateModalSyndicat";
+import { DeleteModalSyndicat } from "../../Component/Button/ButtonAdd";
 import Header from "../Header/Header";
 
-const Clients = () => {
+const Syndicat = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenShowModal, setIsOpenShowModal] = useState<boolean>(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState<boolean>(false);
   const [isOpenUpdateModal, setIsOpenUpdateModal] = useState<boolean>(false);
   const [idClient, setIdClient] = useState<number>();
-  const [idClientUpdate, setIdClientUpdate] = useState<number>();
+  const [idUpdateSyndicat, setidUpdateSyndicat] = useState<number>();
   const [idDelete, setIdDelete] = useState<number>();
 
   const handleModalClose = () => {
@@ -46,7 +41,7 @@ const Clients = () => {
 
   const handleModalOpenUpdate = (id: number) => {
     setIsOpenUpdateModal(true);
-    setIdClientUpdate(id);
+    setidUpdateSyndicat(id);
   };
 
   const handleModalCloseDelete = () => {
@@ -63,15 +58,15 @@ const Clients = () => {
   };
 
   const { data: dataUser } = useQuery({
-    queryKey: ["proprietaireid"],
-    queryFn: GetAllProprietaire,
+    queryKey: ["syndicat"],
+    queryFn: GetAllSyndicat,
   });
   console.log(dataUser);
-  // pour les colonnes du tableau
+
   const columns: GridColDef[] = [
     {
       field: "id",
-      headerName: "ID client",
+      headerName: "ID syndicat",
       renderHeader: () => (
         <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>ID</b>
       ),
@@ -134,7 +129,19 @@ const Clients = () => {
       flex: 1,
     },
     {
-      field: "city",
+      field: "nomline",
+      headerName: "telephone",
+      renderHeader: () => (
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Line/Gare</b>
+      ),
+      flex: 1,
+
+      valueGetter: (Value: any, row: any) => {
+        return `${row.lines?.[0]?.nomline || ""} `;
+      },
+    },
+    {
+      field: "ville",
       headerName: "ville",
       renderHeader: () => (
         <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Ville </b>
@@ -142,7 +149,15 @@ const Clients = () => {
       flex: 1,
     },
     {
-      field: "nationality",
+      field: "quartier",
+      headerName: "Nationalité",
+      renderHeader: () => (
+        <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>quartier </b>
+      ),
+      flex: 1,
+    },
+    {
+      field: "pays",
       headerName: "Nationalité",
       renderHeader: () => (
         <b style={{ fontSize: "0.9rem", fontWeight: "bold" }}>Nationalité </b>
@@ -212,7 +227,7 @@ const Clients = () => {
     <Box m="0px">
       <Box>
         <Header
-          title="La liste des clients"
+          title="La liste de syndicat"
           subtitle="La liste des lines"
           nombre1=""
           entete1=""
@@ -229,27 +244,30 @@ const Clients = () => {
         }}
       />
       <ToastContainer />
-      <Client isOpen={isOpen} handleModalClose={handleModalClose} id={0} />
-
-      <DeleteModalPropriataire
+      <AddModalSyndicat
+        isOpen={isOpen}
+        handleModalClose={handleModalClose}
+        id={0}
+      />
+      <DeleteModalSyndicat
         isOpen={isOpenDeleteModal}
         handleClose={handleModalCloseDelete}
         idItem={idDelete}
       />
-      <ShowModal
+      <ShowModalSyndicat
         id={idClient!}
         isOpen={isOpenShowModal}
         role={"Admin"}
         handleModalClose={handleModalCloseShowModal}
       />
-      <UpdateModal
-        id={idClientUpdate!}
+      <UpdateModalSyndicat
+        id={0}
         isOpen={isOpenUpdateModal}
         handleModalClose={handleModalCloseUpdate}
-        idSyndicat={0}
+        idSyndicat={idUpdateSyndicat!}
       />
     </Box>
   );
 };
 
-export default Clients;
+export default Syndicat;

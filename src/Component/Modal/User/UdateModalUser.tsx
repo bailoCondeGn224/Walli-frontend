@@ -179,7 +179,7 @@ const UpdateModalUser: React.FC<UpdateModalUserProps> = ({
                     helperText={touched.firstname && errors.firstname}
                   />
                 </Box>
-                <Box>
+                {/* <Box>
                   <label htmlFor="lastname">Nom</label>
                   <TextField
                     fullWidth
@@ -268,7 +268,7 @@ const UpdateModalUser: React.FC<UpdateModalUserProps> = ({
                       </MenuItem>
                     ))}
                   </Select>
-                </Box>
+                </Box> */}
               </Box>
             </DialogContent>
 

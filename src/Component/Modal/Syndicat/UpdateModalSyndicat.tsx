@@ -6,30 +6,26 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  MenuItem,
-  Select,
   TextField,
 } from "@mui/material";
-import * as Yup from "yup";
-import { Form, Formik } from "formik";
+import { Formik } from "formik";
+import React from "react";
+import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
+
+import { Form } from "react-router-dom";
 import {
   CountryType,
-  InitialValuesType,
+  InitialValuesTypeUdateSyndicat,
   updateClient,
 } from "../../Interface/InterfaceClient";
-import "react-toastify/dist/ReactToastify.css";
-import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import { countries } from "../../../Data/ClientData";
+import { SignupSchema } from "../../Helper/InitialevalueFormik";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  GetByIdProprietaire,
-  updateProprietaire,
-} from "../../../backEnd/AuthService";
 import { toast } from "react-toastify";
+import { GetByIdSyndicat, updateSyndicat } from "../../../backEnd/AuthService";
 
-const UpdateModal: React.FC<updateClient> = ({
-  id,
+const UpdateModalSyndicat: React.FC<updateClient> = ({
+  idSyndicat,
   isOpen,
   handleModalClose,
 }) => {
@@ -46,58 +42,20 @@ const UpdateModal: React.FC<updateClient> = ({
       theme: "light",
     });
 
-  const SignupSchema = Yup.object().shape({
-    dateOfBirth: Yup.string().required("Date de naissance est requise"),
-    city: Yup.string().required("Ville est requise"),
-    phone: Yup.string().required("Numéro de téléphone est requis"),
-    typePiece: Yup.string().required("Type de pièce est requis"),
-    pieceNumber: Yup.string().required("Pièce d'identité est requise"),
-    nationality: Yup.object()
-      .shape({
-        label: Yup.string().required("Label est requis"),
-        code: Yup.string().required("Code est requis"),
-        phone: Yup.string(),
-      })
-      .required("Nationalité est obligatoire"),
-    userId: Yup.number().required("UserID est obligatoire"),
-  });
-
-  function formatDateToISO(date: Date, timezoneOffsetHours?: number): string {
-    if (!(date instanceof Date)) {
-      throw new Error("Invalid date object passed to formatDateToISO");
-    }
-
-    const utcDate = new Date(
-      Date.UTC(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        date.getHours() + timezoneOffsetHours! || 0,
-        date.getMinutes(),
-        date.getSeconds()
-      )
-    );
-
-    if (!isNaN(utcDate.getTime())) {
-      return utcDate.toISOString();
-    } else {
-      throw new Error("Invalid date after adjustments");
-    }
-  }
   const queryClient = useQueryClient();
   const {
     data: dataUser,
     error,
     isLoading,
   } = useQuery({
-    queryKey: ["getProprietaireByIdClient", id],
-    queryFn: () => GetByIdProprietaire(id),
-    enabled: !!id,
+    queryKey: ["getSyndicatById", idSyndicat],
+    queryFn: () => GetByIdSyndicat(idSyndicat),
+    enabled: !!idSyndicat,
   });
 
   const mutation = useMutation({
     mutationFn: ({ id, userData }: { id: number; userData: any }) =>
-      updateProprietaire(id, userData),
+      updateSyndicat(id, userData),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["proprietaireid"],
@@ -116,36 +74,32 @@ const UpdateModal: React.FC<updateClient> = ({
 
   const handleSubmits = (values: any) => {
     const nationalityLabel = values.nationality ? values.nationality.label : "";
-    const formattedDateOfBirth = formatDateToISO(new Date(values.dateOfBirth));
-
     const submissionValues = {
       ...values,
-      nationality: nationalityLabel,
+      pays: nationalityLabel,
       userId: values.userId,
-      dateOfBirth: formattedDateOfBirth,
     };
 
     console.log(submissionValues);
-
     mutation.mutate({
-      id: id,
+      id: idSyndicat,
       userData: submissionValues,
     });
   };
 
-  const initialValues: InitialValuesType = {
+  const initialValues: InitialValuesTypeUdateSyndicat = {
     userId: dataUser?.userId || 0,
     dateOfBirth: dataUser?.dateOfBirth || "",
-    city: dataUser?.city || "",
+    ville: dataUser?.ville || "",
     phone: dataUser?.phone || "",
-    typePiece: dataUser?.typePiece || "",
-    pieceNumber: dataUser?.pieceNumber || "",
-    nationality: dataUser?.nationality || {
+    pays: dataUser?.pays || {
       label: "",
       code: "",
       phone: "",
     },
+    quartier: dataUser?.quartier || "",
   };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -258,20 +212,20 @@ const UpdateModal: React.FC<updateClient> = ({
                   />
                 </Box>
                 <Box>
-                  <label htmlFor="city" style={{ fontWeight: "bold" }}>
+                  <label htmlFor="ville" style={{ fontWeight: "bold" }}>
                     Ville
                   </label>
                   <TextField
                     size="small"
                     fullWidth
-                    id="outlined-city"
-                    name="city"
+                    id="outlined-ville"
+                    name="ville"
                     variant="outlined"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.city}
-                    error={!!touched.city && !!errors.city}
-                    helperText={touched.city && errors.city}
+                    value={values.ville}
+                    error={!!touched.ville && !!errors.ville}
+                    helperText={touched.ville && errors.ville}
                     sx={{ height: "40px" }}
                   />
                 </Box>
@@ -293,51 +247,9 @@ const UpdateModal: React.FC<updateClient> = ({
                     sx={{ height: "40px" }}
                   />
                 </Box>
+
                 <Box>
-                  <label htmlFor="pieceNumber" style={{ fontWeight: "bold" }}>
-                    N° Piece Identité
-                  </label>
-                  <TextField
-                    size="small"
-                    fullWidth
-                    id="outlined-pieceNumber"
-                    name="pieceNumber"
-                    variant="outlined"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.pieceNumber}
-                    error={!!touched.pieceNumber && !!errors.pieceNumber}
-                    helperText={touched.pieceNumber && errors.pieceNumber}
-                    sx={{ height: "40px" }}
-                  />
-                </Box>
-                <Box>
-                  <label htmlFor="typePiece" style={{ fontWeight: "bold" }}>
-                    Type Piece Identité
-                  </label>
-                  <FormControl fullWidth size="small">
-                    <Select
-                      labelId="select-typePiece"
-                      id="select-typePiece"
-                      name="typePiece"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.typePiece}
-                      error={!!touched.typePiece && !!errors.typePiece}
-                      sx={{ height: "40px" }}
-                    >
-                      {["PASSPORT", "CARTE IDENTITE", "CARTE ELECTEUR"].map(
-                        (piece) => (
-                          <MenuItem key={piece} value={piece}>
-                            {piece}
-                          </MenuItem>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
-                </Box>
-                <Box>
-                  <label htmlFor="nationality" style={{ fontWeight: "bold" }}>
+                  <label htmlFor="pays" style={{ fontWeight: "bold" }}>
                     Nationalité
                   </label>
                   <Autocomplete
@@ -346,12 +258,12 @@ const UpdateModal: React.FC<updateClient> = ({
                     getOptionLabel={(option: CountryType) =>
                       option.label || "Unknown Country"
                     }
-                    value={values.nationality}
+                    value={values.pays}
                     isOptionEqualToValue={(option, value) =>
                       option.code === value?.code
                     }
                     onChange={(event, value: CountryType | null) => {
-                      setFieldValue("nationality", value);
+                      setFieldValue("pays", value);
                     }}
                     renderOption={(props, option) => (
                       <Box
@@ -378,12 +290,12 @@ const UpdateModal: React.FC<updateClient> = ({
                         }}
                         size="small"
                         fullWidth
-                        name="nationality"
+                        name="pays"
                         variant="outlined"
-                        error={!!touched.nationality && !!errors.nationality}
+                        error={!!touched.pays && !!errors.pays}
                         helperText={
-                          touched.nationality && errors.nationality
-                            ? String(errors.nationality)
+                          touched.pays && errors.pays
+                            ? String(errors.pays)
                             : undefined
                         }
                         sx={{ height: "40px" }}
@@ -447,4 +359,4 @@ const UpdateModal: React.FC<updateClient> = ({
   );
 };
 
-export default UpdateModal;
+export default UpdateModalSyndicat;
